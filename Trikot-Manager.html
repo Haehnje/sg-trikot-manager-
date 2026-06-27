@@ -436,6 +436,19 @@
 <div id="page-lineup" class="page">
   <h2>Aufstellung & Trikot-Matching</h2>
   <div class="card">
+    <h3>Spielinfo <span style="font-size:12px;font-weight:400;color:var(--text-muted);">(optional)</span></h3>
+    <div class="form-row" style="margin-bottom:0;">
+      <div class="form-group" style="margin:0;">
+        <label>Spieldatum</label>
+        <input type="date" id="game-date">
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>Gegner</label>
+        <input type="text" id="game-opponent" placeholder="z.B. FC Beispiel">
+      </div>
+    </div>
+  </div>
+  <div class="card">
     <h3>1. Trikotsatz wählen</h3>
     <select id="lineup-set-select" onchange="onSetSelected()" style="max-width:300px;">
       <option value="">— Trikotsatz auswählen —</option>
@@ -471,7 +484,11 @@
     <div class="card">
       <div class="result-header">
         <h3 style="margin:0">3. Trikot-Matching</h3>
-        <button class="btn btn-primary btn-sm" onclick="runMatch()">Neu berechnen</button>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm" onclick="exportSheet('image')">🖼 Bild</button>
+          <button class="btn btn-sm" onclick="exportSheet('pdf')">📄 PDF</button>
+          <button class="btn btn-primary btn-sm" onclick="runMatch()">Neu berechnen</button>
+        </div>
       </div>
       <div class="stats-row" id="match-stats"></div>
       <div id="match-result-list"></div>
@@ -722,6 +739,7 @@ function renderPlayers() {
         <div class="player-info">
           <div class="player-name">${esc(p.name)} <span class="badge ${isActive ? 'badge-green' : ''}" style="${isActive ? '' : 'background:#eee;color:#999;'}">${isActive ? 'Aktiv' : 'Inaktiv'}</span></div>
           <div class="player-meta">Größe: <strong>${p.size}</strong> · Wunschnummer: <strong>${p.preferredNumber || '—'}</strong></div>
+          ${(()=>{ const vl = db.lineups.filter(l=>l.playerIds.includes(p.id)).map(l=>l.name); return vl.length ? `<div style="font-size:11px;color:var(--text-muted);margin-top:1px;">Vorlagen: ${vl.map(n=>`<span style="background:#f0f0f0;border-radius:4px;padding:0 5px;">${esc(n)}</span>`).join(' ')}</div>` : ''; })()}
         </div>
         <div style="display:flex;gap:6px;">
           <button class="btn btn-sm" onclick="toggleActive('${p.id}')">${isActive ? 'Inaktiv setzen' : 'Aktiv setzen'}</button>
@@ -829,16 +847,17 @@ function renderPlayerSelect() {
     el.innerHTML = '<div class="empty-state" style="padding:1rem;">Kein Spieler gefunden.</div>';
     return;
   }
-  el.innerHTML = filtered.map(p => `
-    <label class="player-checkbox ${selectedPlayers.has(p.id)?'selected':''}">
+  el.innerHTML = filtered.map(p => {
+    const isActive = p.active !== false;
+    return `<label class="player-checkbox ${selectedPlayers.has(p.id)?'selected':''}">
       <input type="checkbox" ${selectedPlayers.has(p.id)?'checked':''} onchange="togglePlayer('${p.id}',this)">
       <div class="player-avatar" style="width:30px;height:30px;font-size:11px;">${initials(p.name)}</div>
       <div>
-        <div style="font-size:14px;font-weight:500;">${esc(p.name)}</div>
+        <div style="font-size:14px;font-weight:500;">${esc(p.name)} <span style="font-size:11px;padding:1px 6px;border-radius:10px;font-weight:400;${isActive?'background:#eaf3de;color:#3b6d11;':'background:#eee;color:#888;'}">${isActive?'Aktiv':'Inaktiv'}</span></div>
         <div style="font-size:12px;color:var(--text-muted);">Größe ${p.size}${p.preferredNumber ? ' · Wunsch: #'+p.preferredNumber : ''}</div>
       </div>
-    </label>
-  `).join('');
+    </label>`;
+  }).join('');
   updateSelectedCount();
 }
 function togglePlayer(id, cb) {
@@ -1136,6 +1155,73 @@ function importCSV(e) {
   e.target.value = '';
 }
 
+// ---- EXPORT AUFSTELLUNGSBLATT ----
+function exportSheet(mode) {
+  const setId = document.getElementById('lineup-set-select').value;
+  const setName = setId ? db.sets.find(x=>x.id===setId)?.name || '' : '';
+  const dateVal = document.getElementById('game-date').value;
+  const opponent = document.getElementById('game-opponent').value.trim();
+  const dateStr = dateVal ? new Date(dateVal).toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}) : '';
+
+  const resultList = document.getElementById('match-result-list');
+  if (!resultList || !resultList.children.length) { alert('Bitte zuerst das Matching durchführen.'); return; }
+
+  const logoEl = document.querySelector('header img');
+  const logoSrc = logoEl ? logoEl.src : '';
+
+  const sheet = document.getElementById('export-sheet');
+  sheet.style.display = 'block';
+  sheet.innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:3px solid #cc0000;">
+      ${logoSrc ? `<img src="${logoSrc}" style="height:64px;width:auto;">` : ''}
+      <div>
+        <div style="font-size:20px;font-weight:700;color:#111;">SG Bliesen-Winterbach</div>
+        <div style="font-size:13px;color:#555;margin-top:2px;">Trikot-Aufstellung</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:24px;margin-bottom:20px;font-size:14px;flex-wrap:wrap;">
+      ${dateStr ? `<div><span style="color:#888;">Datum:</span> <strong>${dateStr}</strong></div>` : ''}
+      ${opponent ? `<div><span style="color:#888;">Gegner:</span> <strong>${opponent}</strong></div>` : ''}
+      ${setName ? `<div><span style="color:#888;">Trikot:</span> <strong>${setName}</strong></div>` : ''}
+    </div>
+    <div>${Array.from(resultList.querySelectorAll('.match-row')).map(row => {
+      const num = row.querySelector('.n')?.textContent || '—';
+      const sz  = row.querySelector('.s')?.textContent || '';
+      const name = row.querySelectorAll('div[style]')[1]?.querySelector('div')?.textContent || '';
+      const badge = row.querySelector('.badge')?.textContent || '';
+      const isNone = row.querySelector('.none-jersey');
+      const isWarn = row.querySelector('.warning-jersey') && !isNone;
+      const color = isNone ? '#cc0000' : isWarn ? '#854f0b' : '#3b6d11';
+      const bg    = isNone ? '#fdecea'  : isWarn ? '#faeeda'  : '#eaf3de';
+      return `<div style="display:flex;align-items:center;gap:12px;padding:8px 10px;margin-bottom:4px;border-radius:6px;background:#f8f8f8;">
+        <div style="width:44px;height:44px;border-radius:6px;background:${bg};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="font-size:18px;font-weight:700;color:${color};">${num}</div>
+          <div style="font-size:10px;color:${color};opacity:.8;">${sz}</div>
+        </div>
+        <div style="flex:1;font-size:14px;font-weight:500;">${name}</div>
+        <div style="font-size:12px;padding:2px 8px;border-radius:10px;background:${bg};color:${color};">${badge}</div>
+      </div>`;
+    }).join('')}</div>
+    <div style="margin-top:20px;font-size:11px;color:#aaa;text-align:right;">SG Bliesen-Winterbach · Trikot-Manager</div>`;
+
+  html2canvas(sheet, {scale:2, backgroundColor:'#ffffff', useCORS:true, allowTaint:true}).then(canvas => {
+    sheet.style.display = 'none';
+    if (mode === 'image') {
+      const a = document.createElement('a');
+      a.download = 'Aufstellung' + (dateVal?'-'+dateVal:'') + '.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    } else {
+      const {jsPDF} = window.jspdf;
+      const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
+      const w = pdf.internal.pageSize.getWidth();
+      const h = canvas.height * w / canvas.width;
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, w, h);
+      pdf.save('Aufstellung' + (dateVal?'-'+dateVal:'') + '.pdf');
+    }
+  }).catch(()=>{ sheet.style.display='none'; alert('Export fehlgeschlagen. Bitte Matching neu berechnen.'); });
+}
+
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
@@ -1168,6 +1254,9 @@ if (!db.sets.length && !db.players.length) {
   save();
 }
 </script>
+<div id="export-sheet" style="display:none;position:fixed;left:-9999px;top:0;width:600px;padding:32px;background:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js").catch(function(){});
