@@ -441,15 +441,23 @@
   <h2>Aufstellung & Trikot-Matching</h2>
   <div class="card">
     <h3>Spielinfo <span style="font-size:12px;font-weight:400;color:var(--text-muted);">(optional)</span></h3>
-    <div class="form-row" style="margin-bottom:0;">
+    <div class="form-row" style="margin-bottom:8px;">
       <div class="form-group" style="margin:0;">
-        <label>Spieldatum</label>
-        <input type="date" id="game-date">
+        <label>Mannschaft</label>
+        <input type="text" id="game-mannschaft" list="mannschaft-list" placeholder="z.B. 1. Mannschaft">
+        <datalist id="mannschaft-list"></datalist>
       </div>
       <div class="form-group" style="margin:0;">
         <label>Gegner</label>
         <input type="text" id="game-opponent" placeholder="z.B. FC Beispiel">
       </div>
+    </div>
+    <div class="form-row" style="margin-bottom:0;">
+      <div class="form-group" style="margin:0;">
+        <label>Spieldatum</label>
+        <input type="date" id="game-date">
+      </div>
+      <div class="form-group" style="margin:0;"></div>
     </div>
   </div>
   <div class="card">
@@ -1089,6 +1097,9 @@ function renderLineup() {
     vsel.innerHTML = '<option value="">— Vorlage laden —</option>' +
       db.lineups.map(l => `<option value="${l.id}" ${l.id===vcur?'selected':''}>${esc(l.name)} (${l.playerIds.length} Spieler)</option>`).join('');
   }
+  // Mannschaft-Datalist aus Vorlagen befüllen
+  const dl = document.getElementById('mannschaft-list');
+  if (dl) dl.innerHTML = db.lineups.map(l => `<option value="${esc(l.name)}">`).join('');
   onSetSelected();
 }
 function onSetSelected() {
@@ -1534,6 +1545,7 @@ function exportSheet(mode) {
   const setName = setId ? db.sets.find(x=>x.id===setId)?.name || '' : '';
   const dateVal = document.getElementById('game-date').value;
   const opponent = document.getElementById('game-opponent').value.trim();
+  const mannschaft = document.getElementById('game-mannschaft').value.trim();
   const dateStr = dateVal ? new Date(dateVal).toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}) : '';
   const logoEl = document.querySelector('header img');
   const logoSrc = logoEl ? logoEl.src : '';
@@ -1571,7 +1583,8 @@ function exportSheet(mode) {
         <div style="font-size:13px;color:#555;margin-top:2px;">Trikot-Aufstellung</div>
       </div>
     </div>
-    ${(dateStr||opponent||setName) ? `<div style="display:flex;gap:24px;margin-bottom:16px;font-size:14px;flex-wrap:wrap;">
+    ${(mannschaft||dateStr||opponent||setName) ? `<div style="display:flex;gap:24px;margin-bottom:16px;font-size:14px;flex-wrap:wrap;">
+      ${mannschaft ? `<div><span style="color:#888;">Mannschaft:</span> <strong>${esc(mannschaft)}</strong></div>` : ''}
       ${dateStr ? `<div><span style="color:#888;">Datum:</span> <strong>${dateStr}</strong></div>` : ''}
       ${opponent ? `<div><span style="color:#888;">Gegner:</span> <strong>${esc(opponent)}</strong></div>` : ''}
       ${setName ? `<div><span style="color:#888;">Trikot:</span> <strong>${esc(setName)}</strong></div>` : ''}
