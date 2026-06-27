@@ -100,7 +100,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
+  }
+  .collapsible-body {
+    margin-top: 1rem;
   }
   .btn {
     display: inline-flex;
@@ -394,6 +397,7 @@
     <button onclick="showPage('players')">Spieler</button>
     <button onclick="showPage('vorlagen')">Vorlagen</button>
     <button onclick="showPage('lineup')">Aufstellung</button>
+    <button onclick="showPage('guide')">Anleitung</button>
   </nav>
 </header>
 
@@ -496,6 +500,82 @@
   </div>
 </div>
 
+<!-- === ANLEITUNG === -->
+<div id="page-guide" class="page">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+    <h2 style="margin:0;">Anleitung</h2>
+    <button class="btn btn-primary" onclick="downloadGuidePDF()">⬇ PDF herunterladen</button>
+  </div>
+
+  <div id="guide-content">
+
+    <div class="card">
+      <h3 style="color:var(--primary);margin-top:0;">Willkommen beim Trikot-Manager</h3>
+      <p style="font-size:14px;line-height:1.7;">Der Trikot-Manager der <strong>SG Bliesen-Winterbach</strong> hilft dir, Trikotsätze zu verwalten, Spieler zuzuordnen und vor jedem Spiel eine Aufstellung mit automatischer Trikotzuweisung zu erstellen. Die App läuft direkt im Browser und speichert alle Daten lokal auf deinem Gerät.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">1. Trikotsätze</h3>
+      <p style="font-size:14px;line-height:1.7;"><strong>Trikotsätze anlegen:</strong> Über „+ Neuer Satz" einen Satz anlegen, z.B. „Heimtrikot 2024". Danach über „+ Trikot" einzelne Trikots mit Nummer und Größe hinzufügen.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>Trikots hinzufügen:</strong> Jedes Trikot hat eine Nummer (z.B. 9) und eine Größe (XS – 3XL). Mehrere Trikots können nacheinander im selben Dialog hinzugefügt werden.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>Einklappen:</strong> Karten können durch Klick auf den Header ein- und ausgeklappt werden (▼ / ▶), um den Überblick zu behalten.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>Bearbeiten / Löschen:</strong> Name eines Satzes über „Bearbeiten" ändern, einzelne Trikots über × entfernen, ganzen Satz über „Löschen" entfernen.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">2. Spieler</h3>
+      <p style="font-size:14px;line-height:1.7;"><strong>Spieler anlegen:</strong> Über „+ Neuer Spieler" Name, Trikotsatgröße und optional eine Wunsch-Trikotnummer eintragen. Die Wunschnummer wird beim Trikot-Matching bevorzugt.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>Aktiv / Inaktiv:</strong> Spieler können über den Button „Inaktiv setzen" / „Aktiv setzen" ein- oder ausgeblendet werden, z.B. für verletzte Spieler. In der Aufstellung sind inaktive Spieler standardmäßig ausgeblendet.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>Vorlagen-Zugehörigkeit:</strong> Auf der Spielerseite wird angezeigt, in welchen Vorlagen ein Spieler eingetragen ist.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>CSV Import / Export:</strong> Spieler können als CSV-Datei exportiert (für Excel) oder aus einer CSV importiert werden. Beim Import werden bestehende Spieler per Name abgeglichen und aktualisiert, neue Spieler werden hinzugefügt. Eine leere Vorlage zum Ausfüllen steht ebenfalls zum Download bereit.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">3. Vorlagen (Standardaufstellungen)</h3>
+      <p style="font-size:14px;line-height:1.7;"><strong>Vorlage anlegen:</strong> Über „+ Neue Vorlage" eine Standardaufstellung erstellen, z.B. „1. Mannschaft". Spieler per Checkbox auswählen – das Suchfeld hilft bei großen Kader schnell den richtigen Spieler zu finden.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>Vorlage verwenden:</strong> In der Aufstellung (Schritt 2) kann eine gespeicherte Vorlage geladen werden, um die Spielerauswahl automatisch vorzubelegen.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>Einklappen:</strong> Wie bei den Trikotsätzen können Vorlagen-Karten durch Klick auf den Header ein- und ausgeklappt werden.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">4. Aufstellung & Trikot-Matching</h3>
+      <p style="font-size:14px;line-height:1.7;"><strong>Spielinfo (optional):</strong> Spieldatum und Gegner eintragen – diese Angaben erscheinen auf dem exportierten Dokument.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>Schritt 1 – Trikotsatz wählen:</strong> Den gewünschten Satz aus der Liste auswählen. Die verfügbaren Trikots werden als Vorschau angezeigt.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>Schritt 2 – Spieler auswählen:</strong> Spieler per Klick auswählen. Über den Filter lassen sich nur aktive Spieler anzeigen. Das Suchfeld ermöglicht schnelles Auffinden einzelner Spieler. Alternativ eine gespeicherte Vorlage laden, die die Auswahl automatisch befüllt.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>Schritt 3 – Trikot-Matching:</strong> Nach Klick auf „Trikots zuordnen" vergibt die App automatisch Trikots nach folgendem Algorithmus:</p>
+      <ol style="font-size:14px;line-height:1.9;padding-left:20px;">
+        <li>Wunschnummer <strong>und</strong> passende Größe → perfekte Übereinstimmung</li>
+        <li>Wunschnummer, aber andere Größe</li>
+        <li>Passende Größe, beliebige Nummer</li>
+        <li>Kein passendes Trikot gefunden</li>
+      </ol>
+      <p style="font-size:14px;line-height:1.7;"><strong>Manuelle Anpassung:</strong> Nach dem Matching kann jede Trikot-Zuweisung manuell geändert werden. Im Dropdown sind freie Trikots grün (✓) oben, vergebene Trikots rot (✗) unten aufgelistet. Bei Auswahl eines vergebenen Trikots erfolgt automatisch ein Tausch.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">5. Export</h3>
+      <p style="font-size:14px;line-height:1.7;"><strong>Bild (PNG):</strong> Die Aufstellung mit Trikotzuweisung als PNG-Datei herunterladen – ideal zum Teilen per WhatsApp oder anderen Messengern.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>PDF:</strong> Die Aufstellung als PDF herunterladen – gut für den Ausdruck oder das Archiv.</p>
+      <p style="font-size:14px;line-height:1.7;">Beide Exporte enthalten Datum, Gegner, alle zugeordneten Spieler mit Trikotnummer sowie nicht zugeordnete Spieler.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0;">6. Daten sichern & übertragen</h3>
+      <p style="font-size:14px;line-height:1.7;">Alle Daten werden <strong>lokal auf dem Gerät</strong> gespeichert und sind nicht automatisch mit anderen Geräten synchronisiert. Um Daten zu sichern oder auf ein anderes Gerät zu übertragen:</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>JSON Export:</strong> Kompletten Datenstand (Trikotsätze, Spieler, Vorlagen) als JSON-Datei exportieren.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>JSON Import:</strong> Gesicherte JSON-Datei auf einem anderen Gerät importieren. Achtung: Bestehende Daten werden dabei überschrieben.</p>
+      <p style="font-size:14px;line-height:1.7;"><strong>Tipp:</strong> Regelmäßig einen JSON-Export erstellen und sicher ablegen, z.B. in der Cloud oder per E-Mail an alle Trainer senden.</p>
+    </div>
+
+    <div class="card" style="border-color:var(--primary);background:rgba(204,0,0,0.04);">
+      <h3 style="margin-top:0;">App-URL</h3>
+      <p style="font-size:14px;line-height:1.7;">Die App ist unter folgender Adresse erreichbar und kann auf dem Startbildschirm des Handys installiert werden:</p>
+      <p style="font-size:14px;font-family:monospace;background:var(--surface-2,#1e1e1e);padding:10px 14px;border-radius:8px;word-break:break-all;">https://haehnje.github.io/sg-trikot-manager-/Trikot-Manager.html</p>
+    </div>
+
+  </div><!-- /#guide-content -->
+</div>
+
 </main>
 
 <!-- Modal: Neuer Trikotsatz -->
@@ -556,7 +636,8 @@
     </div>
     <div class="form-group">
       <label>Spieler</label>
-      <div id="vorlage-player-list" style="max-height:280px;overflow-y:auto;border:0.5px solid var(--border);border-radius:var(--radius);padding:6px;"></div>
+      <input type="text" id="vorlage-search" placeholder="Spieler suchen…" oninput="filterVorlageList()" style="margin-bottom:6px;">
+      <div id="vorlage-player-list" style="max-height:260px;overflow-y:auto;border:0.5px solid var(--border);border-radius:var(--radius);padding:6px;"></div>
     </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-vorlage')">Abbrechen</button>
@@ -600,6 +681,10 @@ const SIZES = ['XS','S','M','L','XL','XXL','3XL'];
 let db = load();
 let editSetId = null, editPlayerId = null, jerseyTargetSetId = null;
 let selectedPlayers = new Set();
+let lastMatchResults = { results: [], unmatched: [] };
+let manualResults = [], manualUnmatched = [], manualSetJerseys = [];
+let collapsedSets = new Set();
+let collapsedVorlagen = new Set();
 
 function load() {
   try {
@@ -616,37 +701,238 @@ function showPage(name) {
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   const btns = document.querySelectorAll('nav button');
-  const idx = {sets:0, players:1, vorlagen:2, lineup:3}[name];
-  btns[idx].classList.add('active');
+  const idx = {sets:0, players:1, vorlagen:2, lineup:3, guide:4}[name];
+  if (idx !== undefined) btns[idx].classList.add('active');
   if (name === 'sets') renderSets();
   if (name === 'players') renderPlayers();
   if (name === 'vorlagen') renderVorlagen();
   if (name === 'lineup') renderLineup();
 }
 
+function downloadGuidePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const W = 210, margin = 18, lineW = W - margin * 2;
+  let y = 0;
+
+  const primary = [204, 0, 0];
+  const dark    = [17, 17, 17];
+  const mid     = [80, 80, 80];
+  const light   = [240, 240, 240];
+
+  function checkPage(needed = 10) {
+    if (y + needed > 272) { doc.addPage(); y = 18; }
+  }
+
+  function heading1(txt) {
+    checkPage(18);
+    doc.setFillColor(...primary);
+    doc.rect(margin, y, lineW, 10, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(255, 255, 255);
+    doc.text(txt, margin + 4, y + 7);
+    y += 14;
+  }
+
+  function heading2(txt) {
+    checkPage(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...primary);
+    doc.text(txt, margin, y);
+    y += 6;
+    doc.setDrawColor(...primary);
+    doc.setLineWidth(0.4);
+    doc.line(margin, y, margin + lineW, y);
+    y += 4;
+  }
+
+  function body(txt, indent = 0) {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...mid);
+    const lines = doc.splitTextToSize(txt, lineW - indent);
+    lines.forEach(line => {
+      checkPage(6);
+      doc.text(line, margin + indent, y);
+      y += 5.5;
+    });
+    y += 1;
+  }
+
+  function bullet(txt) {
+    checkPage(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...mid);
+    doc.text('•', margin + 2, y);
+    const lines = doc.splitTextToSize(txt, lineW - 8);
+    lines.forEach((line, i) => {
+      checkPage(6);
+      doc.text(line, margin + 7, y);
+      y += 5.5;
+    });
+    y += 0.5;
+  }
+
+  function gap(mm = 4) { y += mm; }
+
+  // ---- COVER ----
+  doc.setFillColor(...dark);
+  doc.rect(0, 0, 210, 297, 'F');
+  doc.setFillColor(...primary);
+  doc.rect(0, 110, 210, 4, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(28);
+  doc.setTextColor(255, 255, 255);
+  doc.text('Trikot-Manager', 105, 100, { align: 'center' });
+  doc.setFontSize(14);
+  doc.setTextColor(201, 162, 39);
+  doc.text('SG Bliesen-Winterbach', 105, 120, { align: 'center' });
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.setTextColor(180, 180, 180);
+  doc.text('App-Anleitung', 105, 130, { align: 'center' });
+  doc.setFontSize(9);
+  doc.text('Stand: ' + new Date().toLocaleDateString('de-DE', {day:'2-digit',month:'long',year:'numeric'}), 105, 270, { align: 'center' });
+
+  // ---- PAGE 2+ ----
+  doc.addPage();
+  y = 18;
+
+  // Header
+  doc.setFillColor(...dark);
+  doc.rect(0, 0, 210, 12, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(201, 162, 39);
+  doc.text('SG Bliesen-Winterbach · Trikot-Manager', margin, 8);
+
+  heading1('Überblick');
+  body('Der Trikot-Manager hilft dem Trainerteam der SG Bliesen-Winterbach dabei, Trikotsätze zu verwalten, Spieler zuzuordnen und vor jedem Spiel eine Aufstellung mit automatischer Trikotzuweisung zu erstellen. Alle Daten werden lokal auf dem Gerät gespeichert.');
+  gap();
+
+  heading1('1. Trikotsätze');
+  heading2('Satz anlegen');
+  bullet('„+ Neuer Satz" – Name eingeben (z.B. Heimtrikot 2024) und speichern.');
+  bullet('Über „+ Trikot" Trikots mit Nummer und Größe (XS–3XL) hinzufügen.');
+  heading2('Trikots verwalten');
+  bullet('Trikots über × einzeln entfernen.');
+  bullet('Satz umbenennen über „Bearbeiten".');
+  bullet('Ganzen Satz über „Löschen" entfernen.');
+  heading2('Einklappen');
+  bullet('Klick auf den Karten-Header klappt den Inhalt ein oder aus (▼ / ▶).');
+  gap();
+
+  heading1('2. Spieler');
+  heading2('Spieler anlegen & bearbeiten');
+  bullet('„+ Neuer Spieler" – Name, Größe und optional Wunsch-Trikotnummer eingeben.');
+  bullet('Die Wunschnummer wird beim Trikot-Matching bevorzugt berücksichtigt.');
+  bullet('Spieler bearbeiten oder löschen über die Icons in der Spieler-Karte.');
+  heading2('Aktiv / Inaktiv');
+  bullet('Spieler können als inaktiv markiert werden (z.B. bei Verletzung).');
+  bullet('Inaktive Spieler sind in der Aufstellung standardmäßig ausgeblendet.');
+  heading2('CSV Import / Export');
+  bullet('Spielerliste als CSV exportieren und in Excel öffnen.');
+  bullet('Ausgefüllte CSV wieder importieren – bestehende Spieler werden per Name abgeglichen, neue Spieler hinzugefügt.');
+  bullet('Leere CSV-Vorlage zum Ausfüllen herunterladen.');
+  gap();
+
+  heading1('3. Vorlagen (Standardaufstellungen)');
+  body('Vorlagen speichern eine feste Spielerauswahl, die beim Erstellen der Aufstellung schnell geladen werden kann.');
+  heading2('Vorlage anlegen');
+  bullet('„+ Neue Vorlage" – Name eingeben (z.B. 1. Mannschaft).');
+  bullet('Spieler per Checkbox auswählen. Das Suchfeld hilft bei großen Kadern.');
+  bullet('Ausgewählte Spieler bleiben auch beim Filtern aktiv (nicht vergessen!).');
+  heading2('Vorlage verwenden');
+  bullet('In Aufstellung → Schritt 2 eine Vorlage aus dem Dropdown laden.');
+  bullet('Die Spielerauswahl wird automatisch vorbelegt.');
+  gap();
+
+  heading1('4. Aufstellung & Trikot-Matching');
+  heading2('Spielinfo (optional)');
+  bullet('Spieldatum und Gegner eintragen – erscheinen auf dem exportierten Dokument.');
+  heading2('Schritt 1 – Trikotsatz wählen');
+  bullet('Gewünschten Satz auswählen. Verfügbare Trikots werden als Vorschau angezeigt.');
+  heading2('Schritt 2 – Spieler auswählen');
+  bullet('Spieler per Klick auswählen oder Vorlage laden.');
+  bullet('Filter: nur aktive / alle Spieler anzeigen.');
+  bullet('Suchfeld zum schnellen Auffinden einzelner Spieler.');
+  heading2('Schritt 3 – Trikot-Matching');
+  body('Nach „Trikots zuordnen" vergibt die App automatisch Trikots nach folgendem Algorithmus:');
+  bullet('1. Wunschnummer und passende Größe → perfekte Übereinstimmung');
+  bullet('2. Wunschnummer, aber andere Größe');
+  bullet('3. Passende Größe, beliebige Nummer');
+  bullet('4. Kein passendes Trikot gefunden');
+  heading2('Manuelle Anpassung');
+  bullet('Jede Zuweisung kann per Dropdown manuell geändert werden.');
+  bullet('Freie Trikots stehen oben (✓ grün), vergebene unten (✗ rot).');
+  bullet('Bei Auswahl eines bereits vergebenen Trikots erfolgt automatisch ein Tausch.');
+  gap();
+
+  heading1('5. Export der Aufstellung');
+  bullet('PNG (Bild): Aufstellung als Bild speichern – ideal für WhatsApp & Messenger.');
+  bullet('PDF: Aufstellung als PDF herunterladen – gut für Ausdruck und Archiv.');
+  bullet('Beide Exporte enthalten Datum, Gegner, Spieler mit Trikotnummer und nicht zugeordnete Spieler.');
+  gap();
+
+  heading1('6. Datensicherung & Übertragung');
+  body('Alle Daten werden lokal auf dem Gerät gespeichert und sind nicht automatisch mit anderen Geräten synchronisiert.');
+  heading2('JSON Export / Import');
+  bullet('JSON Export: vollständigen Datenstand (Trikotsätze, Spieler, Vorlagen) sichern.');
+  bullet('JSON Import: Daten auf einem anderen Gerät wiederherstellen. Achtung: bestehende Daten werden überschrieben.');
+  bullet('Tipp: Regelmäßig exportieren und per E-Mail an alle Trainer verteilen.');
+  gap();
+
+  heading1('App-URL & Installation');
+  body('Die App ist im Browser aufrufbar und kann als PWA auf dem Startbildschirm installiert werden:');
+  doc.setFont('courier', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(...dark);
+  checkPage(10);
+  doc.setFillColor(...light);
+  doc.rect(margin, y - 3, lineW, 8, 'F');
+  doc.text('https://haehnje.github.io/sg-trikot-manager-/Trikot-Manager.html', margin + 2, y + 2.5);
+  y += 10;
+  doc.setFont('helvetica', 'normal');
+  body('Auf dem Handy: im Browser öffnen → „Zum Startbildschirm hinzufügen" wählen.');
+
+  doc.save('SG-Bliesen-Winterbach_Trikot-Manager_Anleitung.pdf');
+}
+
 // ---- SETS ----
+function toggleSetCollapse(id) {
+  if (collapsedSets.has(id)) collapsedSets.delete(id); else collapsedSets.add(id);
+  renderSets();
+}
+
 function renderSets() {
   const el = document.getElementById('sets-list');
   if (!db.sets.length) {
     el.innerHTML = '<div class="empty-state">Noch keine Trikotsätze. Lege deinen ersten Satz an.</div>';
     return;
   }
-  el.innerHTML = db.sets.map(s => `
-    <div class="card">
-      <div class="card-header">
-        <div>
+  el.innerHTML = db.sets.map(s => {
+    const collapsed = collapsedSets.has(s.id);
+    const chevron = collapsed ? '▶' : '▼';
+    const body = collapsed ? '' : `<div class="collapsible-body">${s.jerseys.length ? renderJerseyGrid(s) : '<p style="font-size:13px;color:var(--text-muted);">Noch keine Trikots in diesem Satz.</p>'}</div>`;
+    return `<div class="card" style="overflow:hidden;">
+      <div class="card-header" style="cursor:pointer;" onclick="toggleSetCollapse('${s.id}')">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12px;color:var(--text-muted);user-select:none;">${chevron}</span>
           <strong style="font-size:15px;">${esc(s.name)}</strong>
-          <span style="margin-left:8px;" class="badge badge-blue">${s.jerseys.length} Trikots</span>
+          <span class="badge badge-blue">${s.jerseys.length} Trikots</span>
         </div>
-        <div class="set-actions">
+        <div class="set-actions" onclick="event.stopPropagation()">
           <button class="btn btn-sm" onclick="openAddJerseyModal('${s.id}')">+ Trikot</button>
           <button class="btn btn-sm" onclick="openEditSetModal('${s.id}')">Bearbeiten</button>
           <button class="btn btn-sm btn-danger" onclick="deleteSet('${s.id}')">Löschen</button>
         </div>
       </div>
-      ${s.jerseys.length ? renderJerseyGrid(s) : '<p style="font-size:13px;color:var(--text-muted);">Noch keine Trikots in diesem Satz.</p>'}
-    </div>
-  `).join('');
+      ${body}
+    </div>`;
+  }).join('');
 }
 
 function renderJerseyGrid(s) {
@@ -919,40 +1205,54 @@ function runMatch() {
   const perfect = results.filter(r => r.quality==='perfect').length;
   const partial = results.filter(r => r.quality!=='perfect').length;
 
+  manualResults = results.map(r => ({player: {...r.player}, jersey: {...r.jersey}, quality: r.quality}));
+  manualUnmatched = unmatched.map(p => ({...p}));
+  manualSetJerseys = jerseys;
   document.getElementById('match-result-card').style.display = 'block';
-  document.getElementById('match-stats').innerHTML = `
-    <div class="stat-card green"><div class="stat-num">${perfect}</div><div class="stat-label">Perfekte Übereinstimmung</div></div>
-    <div class="stat-card amber"><div class="stat-num">${partial}</div><div class="stat-label">Teilweise zugeordnet</div></div>
-    <div class="stat-card red"><div class="stat-num">${unmatched.length}</div><div class="stat-label">Kein Trikot gefunden</div></div>
-  `;
+  renderManualResult();
+}
 
-  let html = '';
-  if (results.length) {
-    html += results.map(r => {
-      const isPerfect = r.quality==='perfect';
-      const isNumOnly = r.quality==='num-only';
-      const jClass = isPerfect ? '' : (isNumOnly ? 'warning-jersey' : 'warning-jersey');
-      const badge = isPerfect
-        ? '<span class="badge badge-green">Wunsch ✓</span>'
-        : isNumOnly
-          ? '<span class="badge badge-amber">Wunschnr. · andere Größe</span>'
-          : '<span class="badge badge-amber">passende Größe</span>';
-      return `<div class="match-row">
-        <div class="match-jersey ${jClass}">
-          <div class="n">${r.jersey.number}</div>
-          <div class="s">${r.jersey.size}</div>
-        </div>
-        <div style="flex:1;">
-          <div style="font-weight:500;font-size:14px;">${esc(r.player.name)}</div>
-          <div style="font-size:12px;color:var(--text-muted);">Größe ${r.player.size}${r.player.preferredNumber?' · Wunsch #'+r.player.preferredNumber:''}</div>
-        </div>
-        ${badge}
-      </div>`;
-    }).join('');
+function renderManualResult() {
+  // build map of jerseyId -> playerName for taken jerseys
+  const takenMap = {};
+  manualResults.forEach(r => { takenMap[r.jersey.id] = r.player.name; });
+
+  const freeJerseys = manualSetJerseys.filter(j => !takenMap[j.id]).sort((a,b) => a.number - b.number);
+  const takenJerseys = manualSetJerseys.filter(j => !!takenMap[j.id]).sort((a,b) => a.number - b.number);
+
+  function jerseySelect(currentJerseyId, playerId) {
+    const opts = [
+      ...freeJerseys.map(j => `<option value="${j.id}" ${j.id===currentJerseyId?'selected':''} style="background:#d4edda;color:#155724;">✓ #${j.number} ${j.size} — frei</option>`),
+      ...takenJerseys.map(j => {
+        const isSelf = j.id === currentJerseyId;
+        return `<option value="${j.id}" ${isSelf?'selected':''} style="background:${isSelf?'':'#f8d7da'};color:${isSelf?'':'#721c24'};">✗ #${j.number} ${j.size}${!isSelf?' ('+takenMap[j.id]+')':''}</option>`;
+      })
+    ].join('');
+    return `<select onchange="changeJersey('${playerId}',this.value)" style="font-size:12px;padding:3px 5px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);max-width:170px;">${opts}</select>`;
   }
-  if (unmatched.length) {
+
+  const sortedResults = [...manualResults].sort((a,b) => a.player.name.localeCompare(b.player.name,'de'));
+  const sortedUnmatched = [...manualUnmatched].sort((a,b) => a.name.localeCompare(b.name,'de'));
+
+  let html = sortedResults.map(r => {
+    const isPerfect = r.quality==='perfect', isNumOnly = r.quality==='num-only';
+    const jClass = isPerfect ? '' : 'warning-jersey';
+    return `<div class="match-row">
+      <div class="match-jersey ${jClass}">
+        <div class="n">${r.jersey.number}</div>
+        <div class="s">${r.jersey.size}</div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-weight:500;font-size:14px;">${esc(r.player.name)}</div>
+        <div style="font-size:12px;color:var(--text-muted);">Größe ${r.player.size}${r.player.preferredNumber?' · Wunsch #'+r.player.preferredNumber:''}</div>
+      </div>
+      ${jerseySelect(r.jersey.id, r.player.id)}
+    </div>`;
+  }).join('');
+
+  if (sortedUnmatched.length) {
     html += `<div class="section-divider" style="color:var(--danger);">Kein passendes Trikot</div>`;
-    html += unmatched.map(p => `
+    html += sortedUnmatched.map(p => `
       <div class="match-row" style="border-color:var(--border-danger,#f7c1c1);">
         <div class="match-jersey none-jersey">
           <div class="n">—</div>
@@ -962,11 +1262,51 @@ function runMatch() {
           <div style="font-weight:500;font-size:14px;">${esc(p.name)}</div>
           <div style="font-size:12px;color:var(--text-muted);">Größe ${p.size}${p.preferredNumber?' · Wunsch #'+p.preferredNumber:''}</div>
         </div>
-        <span class="badge badge-red">Kein Trikot</span>
+        ${jerseySelect(null, p.id)}
       </div>
     `).join('');
   }
+
   document.getElementById('match-result-list').innerHTML = html;
+
+  const assigned = manualResults.length;
+  const freeCount = manualSetJerseys.filter(j => !takenMap[j.id]).length;
+  document.getElementById('match-stats').innerHTML = `
+    <div class="stat-card green"><div class="stat-num">${assigned}</div><div class="stat-label">Zugeordnet</div></div>
+    <div class="stat-card amber"><div class="stat-num">${freeCount}</div><div class="stat-label">Freie Trikots</div></div>
+    <div class="stat-card red"><div class="stat-num">${manualUnmatched.length}</div><div class="stat-label">Ohne Trikot</div></div>
+  `;
+
+  lastMatchResults = { results: manualResults, unmatched: manualUnmatched };
+}
+
+function changeJersey(playerId, newJerseyId) {
+  if (!newJerseyId) return;
+  const newJersey = manualSetJerseys.find(j => j.id === newJerseyId);
+  if (!newJersey) return;
+
+  const myResult = manualResults.find(r => r.player.id === playerId);
+  const myUnmatched = manualUnmatched.find(p => p.id === playerId);
+  const currentOwner = manualResults.find(r => r.jersey.id === newJerseyId && r.player.id !== playerId);
+
+  if (myResult) {
+    const oldJersey = myResult.jersey;
+    myResult.jersey = newJersey;
+    if (currentOwner) {
+      // swap: current owner gets the old jersey
+      currentOwner.jersey = oldJersey;
+    }
+  } else if (myUnmatched) {
+    if (currentOwner) {
+      // take jersey from current owner → they become unmatched
+      manualResults = manualResults.filter(r => r.player.id !== currentOwner.player.id);
+      manualUnmatched.push(currentOwner.player);
+    }
+    manualUnmatched = manualUnmatched.filter(p => p.id !== playerId);
+    manualResults.push({ player: myUnmatched, jersey: newJersey, quality: 'manual' });
+  }
+
+  renderManualResult();
 }
 
 // ---- UTILS ----
@@ -977,6 +1317,11 @@ function initials(name) {
 // ---- VORLAGEN ----
 let editVorlageId = null;
 
+function toggleVorlageCollapse(id) {
+  if (collapsedVorlagen.has(id)) collapsedVorlagen.delete(id); else collapsedVorlagen.add(id);
+  renderVorlagen();
+}
+
 function renderVorlagen() {
   const el = document.getElementById('vorlagen-list');
   if (!db.lineups.length) {
@@ -985,27 +1330,35 @@ function renderVorlagen() {
   }
   el.innerHTML = db.lineups.map(l => {
     const names = l.playerIds.map(id => db.players.find(p => p.id === id)?.name).filter(Boolean);
-    return `<div class="card">
-      <div class="card-header">
-        <div>
+    const collapsed = collapsedVorlagen.has(l.id);
+    const chevron = collapsed ? '▶' : '▼';
+    const body = collapsed ? '' : `<div class="collapsible-body" style="font-size:13px;color:var(--text-muted);">${names.length ? names.join(', ') : 'Keine Spieler zugeordnet.'}</div>`;
+    return `<div class="card" style="overflow:hidden;">
+      <div class="card-header" style="cursor:pointer;" onclick="toggleVorlageCollapse('${l.id}')">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12px;color:var(--text-muted);user-select:none;">${chevron}</span>
           <strong style="font-size:15px;">${esc(l.name)}</strong>
-          <span style="margin-left:8px;" class="badge badge-blue">${names.length} Spieler</span>
+          <span class="badge badge-blue">${names.length} Spieler</span>
         </div>
-        <div style="display:flex;gap:6px;">
+        <div style="display:flex;gap:6px;" onclick="event.stopPropagation()">
           <button class="btn btn-sm" onclick="openEditVorlageModal('${l.id}')">Bearbeiten</button>
           <button class="btn btn-sm btn-danger" onclick="deleteVorlage('${l.id}')">Löschen</button>
         </div>
       </div>
-      <div style="font-size:13px;color:var(--text-muted);">${names.length ? names.join(', ') : 'Keine Spieler zugeordnet.'}</div>
+      ${body}
     </div>`;
   }).join('');
 }
 
+let vorlageSelected = new Set();
+
 function openNewVorlageModal() {
   editVorlageId = null;
+  vorlageSelected = new Set();
   document.getElementById('modal-vorlage-title').textContent = 'Neue Vorlage';
   document.getElementById('vorlage-name-input').value = '';
-  renderVorlagePlayerList(new Set());
+  document.getElementById('vorlage-search').value = '';
+  renderVorlagePlayerList();
   openModal('modal-vorlage');
   setTimeout(() => document.getElementById('vorlage-name-input').focus(), 100);
 }
@@ -1013,19 +1366,32 @@ function openNewVorlageModal() {
 function openEditVorlageModal(id) {
   editVorlageId = id;
   const l = db.lineups.find(x => x.id === id);
+  vorlageSelected = new Set(l.playerIds);
   document.getElementById('modal-vorlage-title').textContent = 'Vorlage bearbeiten';
   document.getElementById('vorlage-name-input').value = l.name;
-  renderVorlagePlayerList(new Set(l.playerIds));
+  document.getElementById('vorlage-search').value = '';
+  renderVorlagePlayerList();
   openModal('modal-vorlage');
 }
 
-function renderVorlagePlayerList(selected) {
+function filterVorlageList() {
+  // sync current visible checkboxes into vorlageSelected before filtering
+  document.querySelectorAll('#vorlage-player-list input[type=checkbox]').forEach(cb => {
+    if (cb.checked) vorlageSelected.add(cb.value); else vorlageSelected.delete(cb.value);
+  });
+  renderVorlagePlayerList();
+}
+
+function renderVorlagePlayerList() {
   const el = document.getElementById('vorlage-player-list');
+  const query = (document.getElementById('vorlage-search')?.value || '').toLowerCase();
   const sorted = [...db.players].sort((a,b) => a.name.localeCompare(b.name, 'de'));
+  const filtered = query ? sorted.filter(p => p.name.toLowerCase().includes(query)) : sorted;
   if (!sorted.length) { el.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">Keine Spieler vorhanden.</p>'; return; }
-  el.innerHTML = sorted.map(p => `
-    <label class="player-checkbox ${selected.has(p.id)?'selected':''}" style="margin-bottom:2px;">
-      <input type="checkbox" ${selected.has(p.id)?'checked':''} value="${p.id}" onchange="this.closest('label').classList.toggle('selected',this.checked)">
+  if (!filtered.length) { el.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">Keine Spieler gefunden.</p>'; return; }
+  el.innerHTML = filtered.map(p => `
+    <label class="player-checkbox ${vorlageSelected.has(p.id)?'selected':''}" style="margin-bottom:2px;">
+      <input type="checkbox" ${vorlageSelected.has(p.id)?'checked':''} value="${p.id}" onchange="vorlageSelected[this.checked?'add':'delete'](this.value);this.closest('label').classList.toggle('selected',this.checked)">
       <div class="player-avatar" style="width:28px;height:28px;font-size:11px;">${initials(p.name)}</div>
       <span style="font-size:14px;">${esc(p.name)} <span style="color:var(--text-muted);font-size:12px;">${p.size}</span></span>
     </label>
@@ -1035,7 +1401,11 @@ function renderVorlagePlayerList(selected) {
 function saveVorlage() {
   const name = document.getElementById('vorlage-name-input').value.trim();
   if (!name) { alert('Bitte einen Namen eingeben.'); return; }
-  const playerIds = [...document.querySelectorAll('#vorlage-player-list input[type=checkbox]:checked')].map(cb => cb.value);
+  // sync visible checkboxes one last time
+  document.querySelectorAll('#vorlage-player-list input[type=checkbox]').forEach(cb => {
+    if (cb.checked) vorlageSelected.add(cb.value); else vorlageSelected.delete(cb.value);
+  });
+  const playerIds = [...vorlageSelected];
   if (editVorlageId) {
     const l = db.lineups.find(x => x.id === editVorlageId);
     l.name = name; l.playerIds = playerIds;
@@ -1157,54 +1527,62 @@ function importCSV(e) {
 
 // ---- EXPORT AUFSTELLUNGSBLATT ----
 function exportSheet(mode) {
+  const { results, unmatched } = lastMatchResults;
+  if (!results.length && !unmatched.length) { alert('Bitte zuerst das Matching durchführen.'); return; }
+
   const setId = document.getElementById('lineup-set-select').value;
   const setName = setId ? db.sets.find(x=>x.id===setId)?.name || '' : '';
   const dateVal = document.getElementById('game-date').value;
   const opponent = document.getElementById('game-opponent').value.trim();
   const dateStr = dateVal ? new Date(dateVal).toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}) : '';
-
-  const resultList = document.getElementById('match-result-list');
-  if (!resultList || !resultList.children.length) { alert('Bitte zuerst das Matching durchführen.'); return; }
-
   const logoEl = document.querySelector('header img');
   const logoSrc = logoEl ? logoEl.src : '';
+
+  // Alphabetisch sortierte Zeilen
+  const allRows = [
+    ...results.map(r => ({ name: r.player.name, number: r.jersey.number, size: r.jersey.size, ok: true })),
+    ...unmatched.map(p => ({ name: p.name, number: null, size: p.size, ok: false }))
+  ].sort((a,b) => a.name.localeCompare(b.name, 'de'));
+
+  const rowsHtml = allRows.map(row => {
+    const bg    = row.ok ? '#eaf3de' : '#fdecea';
+    const color = row.ok ? '#3b6d11' : '#cc0000';
+    return `<div style="display:flex;align-items:center;padding:9px 12px;margin-bottom:4px;border-radius:6px;background:#f8f8f8;gap:12px;">
+      <div style="flex:1;font-size:15px;font-weight:500;color:#111;">${esc(row.name)}</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        ${row.ok
+          ? `<div style="width:48px;height:48px;border-radius:6px;background:${bg};display:flex;flex-direction:column;align-items:center;justify-content:center;">
+               <div style="font-size:20px;font-weight:700;color:${color};line-height:1;">${row.number}</div>
+               <div style="font-size:10px;color:${color};opacity:.75;">${row.size}</div>
+             </div>`
+          : `<div style="padding:4px 12px;border-radius:6px;background:${bg};color:${color};font-size:13px;font-weight:500;">Kein Trikot</div>`
+        }
+      </div>
+    </div>`;
+  }).join('');
 
   const sheet = document.getElementById('export-sheet');
   sheet.style.display = 'block';
   sheet.innerHTML = `
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:3px solid #cc0000;">
-      ${logoSrc ? `<img src="${logoSrc}" style="height:64px;width:auto;">` : ''}
+      ${logoSrc ? `<img src="${logoSrc}" style="height:64px;width:auto;" crossorigin="anonymous">` : ''}
       <div>
         <div style="font-size:20px;font-weight:700;color:#111;">SG Bliesen-Winterbach</div>
         <div style="font-size:13px;color:#555;margin-top:2px;">Trikot-Aufstellung</div>
       </div>
     </div>
-    <div style="display:flex;gap:24px;margin-bottom:20px;font-size:14px;flex-wrap:wrap;">
+    ${(dateStr||opponent||setName) ? `<div style="display:flex;gap:24px;margin-bottom:16px;font-size:14px;flex-wrap:wrap;">
       ${dateStr ? `<div><span style="color:#888;">Datum:</span> <strong>${dateStr}</strong></div>` : ''}
-      ${opponent ? `<div><span style="color:#888;">Gegner:</span> <strong>${opponent}</strong></div>` : ''}
-      ${setName ? `<div><span style="color:#888;">Trikot:</span> <strong>${setName}</strong></div>` : ''}
+      ${opponent ? `<div><span style="color:#888;">Gegner:</span> <strong>${esc(opponent)}</strong></div>` : ''}
+      ${setName ? `<div><span style="color:#888;">Trikot:</span> <strong>${esc(setName)}</strong></div>` : ''}
+    </div>` : ''}
+    <div style="display:flex;padding:6px 12px;margin-bottom:6px;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;">
+      <div style="flex:1;">Spieler</div><div>Nr.</div>
     </div>
-    <div>${Array.from(resultList.querySelectorAll('.match-row')).map(row => {
-      const num = row.querySelector('.n')?.textContent || '—';
-      const sz  = row.querySelector('.s')?.textContent || '';
-      const name = row.querySelectorAll('div[style]')[1]?.querySelector('div')?.textContent || '';
-      const badge = row.querySelector('.badge')?.textContent || '';
-      const isNone = row.querySelector('.none-jersey');
-      const isWarn = row.querySelector('.warning-jersey') && !isNone;
-      const color = isNone ? '#cc0000' : isWarn ? '#854f0b' : '#3b6d11';
-      const bg    = isNone ? '#fdecea'  : isWarn ? '#faeeda'  : '#eaf3de';
-      return `<div style="display:flex;align-items:center;gap:12px;padding:8px 10px;margin-bottom:4px;border-radius:6px;background:#f8f8f8;">
-        <div style="width:44px;height:44px;border-radius:6px;background:${bg};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;">
-          <div style="font-size:18px;font-weight:700;color:${color};">${num}</div>
-          <div style="font-size:10px;color:${color};opacity:.8;">${sz}</div>
-        </div>
-        <div style="flex:1;font-size:14px;font-weight:500;">${name}</div>
-        <div style="font-size:12px;padding:2px 8px;border-radius:10px;background:${bg};color:${color};">${badge}</div>
-      </div>`;
-    }).join('')}</div>
+    ${rowsHtml}
     <div style="margin-top:20px;font-size:11px;color:#aaa;text-align:right;">SG Bliesen-Winterbach · Trikot-Manager</div>`;
 
-  html2canvas(sheet, {scale:2, backgroundColor:'#ffffff', useCORS:true, allowTaint:true}).then(canvas => {
+  html2canvas(sheet, {scale:2, backgroundColor:'#ffffff', useCORS:true, allowTaint:true, logging:false}).then(canvas => {
     sheet.style.display = 'none';
     if (mode === 'image') {
       const a = document.createElement('a');
@@ -1219,7 +1597,7 @@ function exportSheet(mode) {
       pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, w, h);
       pdf.save('Aufstellung' + (dateVal?'-'+dateVal:'') + '.pdf');
     }
-  }).catch(()=>{ sheet.style.display='none'; alert('Export fehlgeschlagen. Bitte Matching neu berechnen.'); });
+  }).catch(()=>{ sheet.style.display='none'; alert('Export fehlgeschlagen.'); });
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
