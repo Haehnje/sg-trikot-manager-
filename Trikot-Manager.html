@@ -392,6 +392,7 @@
   <nav>
     <button class="active" onclick="showPage('sets')">Trikotsätze</button>
     <button onclick="showPage('players')">Spieler</button>
+    <button onclick="showPage('vorlagen')">Vorlagen</button>
     <button onclick="showPage('lineup')">Aufstellung</button>
   </nav>
 </header>
@@ -408,10 +409,22 @@
 </div>
 
 <!-- === SPIELER === -->
+<div id="page-vorlagen" class="page">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+    <h2 style="margin:0">Standardaufstellungen</h2>
+    <button class="btn btn-primary" onclick="openNewVorlageModal()">+ Neue Vorlage</button>
+  </div>
+  <div id="vorlagen-list"></div>
+</div>
+
 <div id="page-players" class="page">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
     <h2 style="margin:0">Spieler</h2>
-    <button class="btn btn-primary" onclick="openAddPlayerModal()">+ Spieler hinzufügen</button>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn" onclick="exportData()" title="Daten exportieren">⬇ Export</button>
+      <label class="btn" style="cursor:pointer;" title="Daten importieren">⬆ Import<input type="file" accept=".json" onchange="importData(event)" style="display:none;"></label>
+      <button class="btn btn-primary" onclick="openAddPlayerModal()">+ Spieler hinzufügen</button>
+    </div>
   </div>
   <div id="players-list"></div>
 </div>
@@ -428,6 +441,11 @@
   </div>
   <div class="card" id="players-select-card" style="display:none;">
     <h3>2. Spieler auswählen</h3>
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;">
+      <select id="vorlage-select" onchange="loadVorlage()" style="flex:1;">
+        <option value="">— Vorlage laden —</option>
+      </select>
+    </div>
     <input type="text" id="player-search" placeholder="Spieler suchen…" oninput="renderPlayerSelect()" style="margin-bottom:10px;">
     <div class="filter-row">
       <span style="font-size:13px;color:var(--text-muted);">Aufgestellt:</span>
@@ -501,6 +519,25 @@
   </div>
 </div>
 
+<!-- Modal: Vorlage bearbeiten -->
+<div class="modal-overlay" id="modal-vorlage">
+  <div class="modal">
+    <h3 id="modal-vorlage-title">Neue Vorlage</h3>
+    <div class="form-group">
+      <label>Name der Vorlage</label>
+      <input type="text" id="vorlage-name-input" placeholder="z.B. 1. Mannschaft">
+    </div>
+    <div class="form-group">
+      <label>Spieler</label>
+      <div id="vorlage-player-list" style="max-height:280px;overflow-y:auto;border:0.5px solid var(--border);border-radius:var(--radius);padding:6px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-vorlage')">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveVorlage()">Speichern</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Trikot hinzufügen -->
 <div class="modal-overlay" id="modal-jersey">
   <div class="modal">
@@ -539,8 +576,10 @@ let selectedPlayers = new Set();
 
 function load() {
   try {
-    return JSON.parse(localStorage.getItem('trikot-db') || 'null') || { sets: [], players: [] };
-  } catch(e) { return { sets: [], players: [] }; }
+    const d = JSON.parse(localStorage.getItem('trikot-db') || 'null') || { sets: [], players: [], lineups: [] };
+    if (!d.lineups) d.lineups = [];
+    return d;
+  } catch(e) { return { sets: [], players: [], lineups: [] }; }
 }
 function save() { localStorage.setItem('trikot-db', JSON.stringify(db)); }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
@@ -550,10 +589,11 @@ function showPage(name) {
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   const btns = document.querySelectorAll('nav button');
-  const idx = {sets:0, players:1, lineup:2}[name];
+  const idx = {sets:0, players:1, vorlagen:2, lineup:3}[name];
   btns[idx].classList.add('active');
   if (name === 'sets') renderSets();
   if (name === 'players') renderPlayers();
+  if (name === 'vorlagen') renderVorlagen();
   if (name === 'lineup') renderLineup();
 }
 
@@ -726,6 +766,12 @@ function renderLineup() {
   const cur = sel.value;
   sel.innerHTML = '<option value="">— Trikotsatz auswählen —</option>' +
     db.sets.map(s => `<option value="${s.id}" ${s.id===cur?'selected':''}>${esc(s.name)} (${s.jerseys.length} Trikots)</option>`).join('');
+  const vsel = document.getElementById('vorlage-select');
+  if (vsel) {
+    const vcur = vsel.value;
+    vsel.innerHTML = '<option value="">— Vorlage laden —</option>' +
+      db.lineups.map(l => `<option value="${l.id}" ${l.id===vcur?'selected':''}>${esc(l.name)} (${l.playerIds.length} Spieler)</option>`).join('');
+  }
   onSetSelected();
 }
 function onSetSelected() {
@@ -746,6 +792,11 @@ function onSetSelected() {
     ${SIZES.filter(sz=>sizeCounts[sz]).map(sz=>`<span class="badge badge-blue">${sizeCounts[sz]}× ${sz}</span>`).join('')}
   </div>`;
   playersCard.style.display = 'block';
+  const vsel = document.getElementById('vorlage-select');
+  if (vsel && vsel.options.length <= 1) {
+    vsel.innerHTML = '<option value="">— Vorlage laden —</option>' +
+      db.lineups.map(l => `<option value="${l.id}">${esc(l.name)} (${l.playerIds.length} Spieler)</option>`).join('');
+  }
   renderPlayerSelect();
 }
 function renderPlayerSelect() {
@@ -887,6 +938,123 @@ function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 function initials(name) {
   return name.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase() || '?';
 }
+// ---- VORLAGEN ----
+let editVorlageId = null;
+
+function renderVorlagen() {
+  const el = document.getElementById('vorlagen-list');
+  if (!db.lineups.length) {
+    el.innerHTML = '<div class="empty-state">Noch keine Vorlagen. Lege z.B. „1. Mannschaft" an.</div>';
+    return;
+  }
+  el.innerHTML = db.lineups.map(l => {
+    const names = l.playerIds.map(id => db.players.find(p => p.id === id)?.name).filter(Boolean);
+    return `<div class="card">
+      <div class="card-header">
+        <div>
+          <strong style="font-size:15px;">${esc(l.name)}</strong>
+          <span style="margin-left:8px;" class="badge badge-blue">${names.length} Spieler</span>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm" onclick="openEditVorlageModal('${l.id}')">Bearbeiten</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteVorlage('${l.id}')">Löschen</button>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--text-muted);">${names.length ? names.join(', ') : 'Keine Spieler zugeordnet.'}</div>
+    </div>`;
+  }).join('');
+}
+
+function openNewVorlageModal() {
+  editVorlageId = null;
+  document.getElementById('modal-vorlage-title').textContent = 'Neue Vorlage';
+  document.getElementById('vorlage-name-input').value = '';
+  renderVorlagePlayerList(new Set());
+  openModal('modal-vorlage');
+  setTimeout(() => document.getElementById('vorlage-name-input').focus(), 100);
+}
+
+function openEditVorlageModal(id) {
+  editVorlageId = id;
+  const l = db.lineups.find(x => x.id === id);
+  document.getElementById('modal-vorlage-title').textContent = 'Vorlage bearbeiten';
+  document.getElementById('vorlage-name-input').value = l.name;
+  renderVorlagePlayerList(new Set(l.playerIds));
+  openModal('modal-vorlage');
+}
+
+function renderVorlagePlayerList(selected) {
+  const el = document.getElementById('vorlage-player-list');
+  const sorted = [...db.players].sort((a,b) => a.name.localeCompare(b.name, 'de'));
+  if (!sorted.length) { el.innerHTML = '<p style="font-size:13px;color:var(--text-muted);">Keine Spieler vorhanden.</p>'; return; }
+  el.innerHTML = sorted.map(p => `
+    <label class="player-checkbox ${selected.has(p.id)?'selected':''}" style="margin-bottom:2px;">
+      <input type="checkbox" ${selected.has(p.id)?'checked':''} value="${p.id}" onchange="this.closest('label').classList.toggle('selected',this.checked)">
+      <div class="player-avatar" style="width:28px;height:28px;font-size:11px;">${initials(p.name)}</div>
+      <span style="font-size:14px;">${esc(p.name)} <span style="color:var(--text-muted);font-size:12px;">${p.size}</span></span>
+    </label>
+  `).join('');
+}
+
+function saveVorlage() {
+  const name = document.getElementById('vorlage-name-input').value.trim();
+  if (!name) { alert('Bitte einen Namen eingeben.'); return; }
+  const playerIds = [...document.querySelectorAll('#vorlage-player-list input[type=checkbox]:checked')].map(cb => cb.value);
+  if (editVorlageId) {
+    const l = db.lineups.find(x => x.id === editVorlageId);
+    l.name = name; l.playerIds = playerIds;
+  } else {
+    db.lineups.push({ id: uid(), name, playerIds });
+  }
+  save(); closeModal('modal-vorlage'); renderVorlagen();
+}
+
+function deleteVorlage(id) {
+  if (!confirm('Vorlage wirklich löschen?')) return;
+  db.lineups = db.lineups.filter(l => l.id !== id);
+  save(); renderVorlagen();
+}
+
+function loadVorlage() {
+  const id = document.getElementById('vorlage-select').value;
+  if (!id) return;
+  const l = db.lineups.find(x => x.id === id);
+  if (!l) return;
+  selectedPlayers = new Set(l.playerIds.filter(pid => db.players.find(p => p.id === pid)));
+  renderPlayerSelect();
+  if (selectedPlayers.size > 0) runMatch();
+}
+
+// ---- EXPORT / IMPORT ----
+function exportData() {
+  const json = JSON.stringify(db, null, 2);
+  const blob = new Blob([json], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'trikot-daten-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!imported.sets || !imported.players) { alert('Ungültige Datei.'); return; }
+      if (!imported.lineups) imported.lineups = [];
+      if (!confirm(`Daten importieren?\n\n${imported.sets.length} Trikotsätze, ${imported.players.length} Spieler, ${imported.lineups.length} Vorlagen\n\nDie aktuellen Daten werden überschrieben.`)) return;
+      db = imported;
+      save();
+      renderPlayers();
+      alert('Import erfolgreich!');
+    } catch(err) { alert('Fehler beim Lesen der Datei.'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
