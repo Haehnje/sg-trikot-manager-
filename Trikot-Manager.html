@@ -421,8 +421,11 @@
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
     <h2 style="margin:0">Spieler</h2>
     <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button class="btn" onclick="exportData()" title="Daten exportieren">⬇ Export</button>
-      <label class="btn" style="cursor:pointer;" title="Daten importieren">⬆ Import<input type="file" accept=".json" onchange="importData(event)" style="display:none;"></label>
+      <button class="btn" onclick="exportJSON()">⬇ JSON</button>
+      <button class="btn" onclick="exportCSV()">⬇ CSV</button>
+      <button class="btn" onclick="downloadCSVTemplate()" title="Leere CSV-Vorlage für Excel">⬇ CSV-Vorlage</button>
+      <label class="btn" style="cursor:pointer;">⬆ JSON<input type="file" accept=".json" onchange="importJSON(event)" style="display:none;"></label>
+      <label class="btn" style="cursor:pointer;">⬆ CSV<input type="file" accept=".csv,.txt" onchange="importCSV(event)" style="display:none;"></label>
       <button class="btn btn-primary" onclick="openAddPlayerModal()">+ Spieler hinzufügen</button>
     </div>
   </div>
@@ -446,7 +449,14 @@
         <option value="">— Vorlage laden —</option>
       </select>
     </div>
-    <input type="text" id="player-search" placeholder="Spieler suchen…" oninput="renderPlayerSelect()" style="margin-bottom:10px;">
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <select id="status-filter" onchange="renderPlayerSelect()" style="width:140px;">
+        <option value="alle">Alle Spieler</option>
+        <option value="aktiv">Nur Aktive</option>
+        <option value="inaktiv">Nur Inaktive</option>
+      </select>
+      <input type="text" id="player-search" placeholder="Spieler suchen…" oninput="renderPlayerSelect()" style="flex:1;margin-bottom:0;">
+    </div>
     <div class="filter-row">
       <span style="font-size:13px;color:var(--text-muted);">Aufgestellt:</span>
       <span id="selected-count" class="badge badge-blue">0 Spieler</span>
@@ -703,20 +713,23 @@ function renderPlayers() {
     el.innerHTML = '<div class="empty-state">Noch keine Spieler. Füge deine Mannschaft hinzu.</div>';
     return;
   }
+  const sorted = [...db.players].sort((a,b) => a.name.localeCompare(b.name, 'de'));
   el.innerHTML = `<div class="card"><div>${
-    db.players.map(p => `
-      <div class="player-row">
-        <div class="player-avatar">${initials(p.name)}</div>
+    sorted.map(p => {
+      const isActive = p.active !== false;
+      return `<div class="player-row" style="${isActive ? '' : 'opacity:0.5;'}">
+        <div class="player-avatar" style="background:${isActive ? 'var(--accent-bg)' : 'var(--surface-alt)'};">${initials(p.name)}</div>
         <div class="player-info">
-          <div class="player-name">${esc(p.name)}</div>
+          <div class="player-name">${esc(p.name)} <span class="badge ${isActive ? 'badge-green' : ''}" style="${isActive ? '' : 'background:#eee;color:#999;'}">${isActive ? 'Aktiv' : 'Inaktiv'}</span></div>
           <div class="player-meta">Größe: <strong>${p.size}</strong> · Wunschnummer: <strong>${p.preferredNumber || '—'}</strong></div>
         </div>
         <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm" onclick="toggleActive('${p.id}')">${isActive ? 'Inaktiv setzen' : 'Aktiv setzen'}</button>
           <button class="btn btn-sm" onclick="openEditPlayerModal('${p.id}')">Bearbeiten</button>
           <button class="btn btn-sm btn-danger" onclick="deletePlayer('${p.id}')">Löschen</button>
         </div>
-      </div>
-    `).join('')}
+      </div>`;
+    }).join('')}
   </div></div>`;
 }
 
@@ -749,7 +762,7 @@ function savePlayer() {
     const p = db.players.find(x => x.id === editPlayerId);
     Object.assign(p, { name, size, preferredNumber });
   } else {
-    db.players.push({ id: uid(), name, size, preferredNumber });
+    db.players.push({ id: uid(), name, size, preferredNumber, active: true });
   }
   save(); closeModal('modal-player'); renderPlayers();
 }
@@ -806,8 +819,12 @@ function renderPlayerSelect() {
     return;
   }
   const q = (document.getElementById('player-search')?.value || '').toLowerCase().trim();
+  const statusFilter = document.getElementById('status-filter')?.value || 'alle';
   const sorted = [...db.players].sort((a,b) => a.name.localeCompare(b.name, 'de'));
-  const filtered = q ? sorted.filter(p => p.name.toLowerCase().includes(q)) : sorted;
+  let filtered = sorted;
+  if (statusFilter === 'aktiv') filtered = filtered.filter(p => p.active !== false);
+  if (statusFilter === 'inaktiv') filtered = filtered.filter(p => p.active === false);
+  if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
   if (!filtered.length) {
     el.innerHTML = '<div class="empty-state" style="padding:1rem;">Kein Spieler gefunden.</div>';
     return;
@@ -1026,32 +1043,96 @@ function loadVorlage() {
 }
 
 // ---- EXPORT / IMPORT ----
-function exportData() {
-  const json = JSON.stringify(db, null, 2);
-  const blob = new Blob([json], {type: 'application/json'});
+function toggleActive(id) {
+  const p = db.players.find(x => x.id === id);
+  p.active = p.active === false ? true : false;
+  save(); renderPlayers();
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], {type: 'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'trikot-daten-' + new Date().toISOString().slice(0,10) + '.json';
   a.click();
 }
 
-function importData(e) {
+function exportCSV() {
+  const rows = [['Name','Groesse','Wunschnummer','Status']];
+  [...db.players].sort((a,b) => a.name.localeCompare(b.name,'de')).forEach(p => {
+    rows.push([p.name, p.size, p.preferredNumber || '', p.active === false ? 'inaktiv' : 'aktiv']);
+  });
+  const csv = rows.map(r => r.join(';')).join('\r\n');
+  const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'spieler-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+function downloadCSVTemplate() {
+  const csv = 'Name;Groesse;Wunschnummer;Status\r\nMax Mustermann;M;10;aktiv\r\nErika Musterfrau;L;7;aktiv';
+  const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'spieler-vorlage.csv';
+  a.click();
+}
+
+function importJSON(e) {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
     try {
       const imported = JSON.parse(ev.target.result);
-      if (!imported.sets || !imported.players) { alert('Ungültige Datei.'); return; }
+      if (!imported.sets || !imported.players) { alert('Ungültige JSON-Datei.'); return; }
       if (!imported.lineups) imported.lineups = [];
-      if (!confirm(`Daten importieren?\n\n${imported.sets.length} Trikotsätze, ${imported.players.length} Spieler, ${imported.lineups.length} Vorlagen\n\nDie aktuellen Daten werden überschrieben.`)) return;
+      if (!confirm(`JSON importieren?\n\n${imported.sets.length} Trikotsätze, ${imported.players.length} Spieler, ${imported.lineups.length} Vorlagen\n\nAktuelle Daten werden überschrieben.`)) return;
       db = imported;
-      save();
-      renderPlayers();
+      save(); renderPlayers();
       alert('Import erfolgreich!');
     } catch(err) { alert('Fehler beim Lesen der Datei.'); }
   };
   reader.readAsText(file);
+  e.target.value = '';
+}
+
+function importCSV(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const lines = ev.target.result.replace(/^﻿/, '').split(/\r?\n/).filter(l => l.trim());
+      if (!lines.length) { alert('Leere Datei.'); return; }
+      const header = lines[0].split(';').map(h => h.trim().toLowerCase());
+      const iName = header.indexOf('name');
+      const iSize = header.findIndex(h => h.includes('groesse') || h.includes('größe') || h === 'size');
+      const iNum  = header.findIndex(h => h.includes('nummer') || h === 'number');
+      const iStat = header.findIndex(h => h.includes('status'));
+      if (iName < 0 || iSize < 0) { alert('Spalten "Name" und "Groesse" werden benötigt.'); return; }
+      const newPlayers = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(';');
+        const name = cols[iName]?.trim();
+        const size = cols[iSize]?.trim().toUpperCase();
+        if (!name || !size) continue;
+        const preferredNumber = iNum >= 0 && cols[iNum]?.trim() ? parseInt(cols[iNum]) : null;
+        const active = iStat >= 0 ? cols[iStat]?.trim().toLowerCase() !== 'inaktiv' : true;
+        const existing = db.players.find(p => p.name.toLowerCase() === name.toLowerCase());
+        if (existing) {
+          existing.size = size; existing.preferredNumber = preferredNumber; existing.active = active;
+        } else {
+          newPlayers.push({ id: uid(), name, size, preferredNumber, active });
+        }
+      }
+      db.players.push(...newPlayers);
+      save(); renderPlayers();
+      alert(`CSV importiert: ${newPlayers.length} neue Spieler hinzugefügt, bestehende aktualisiert.`);
+    } catch(err) { alert('Fehler beim Lesen der CSV-Datei.'); }
+  };
+  reader.readAsText(file, 'UTF-8');
   e.target.value = '';
 }
 
