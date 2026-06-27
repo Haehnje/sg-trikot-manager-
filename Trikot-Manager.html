@@ -428,6 +428,7 @@
   </div>
   <div class="card" id="players-select-card" style="display:none;">
     <h3>2. Spieler auswählen</h3>
+    <input type="text" id="player-search" placeholder="Spieler suchen…" oninput="renderPlayerSelect()" style="margin-bottom:10px;">
     <div class="filter-row">
       <span style="font-size:13px;color:var(--text-muted);">Aufgestellt:</span>
       <span id="selected-count" class="badge badge-blue">0 Spieler</span>
@@ -753,7 +754,14 @@ function renderPlayerSelect() {
     el.innerHTML = '<div class="empty-state" style="padding:1rem;">Noch keine Spieler angelegt.</div>';
     return;
   }
-  el.innerHTML = db.players.map(p => `
+  const q = (document.getElementById('player-search')?.value || '').toLowerCase().trim();
+  const sorted = [...db.players].sort((a,b) => a.name.localeCompare(b.name, 'de'));
+  const filtered = q ? sorted.filter(p => p.name.toLowerCase().includes(q)) : sorted;
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:1rem;">Kein Spieler gefunden.</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(p => `
     <label class="player-checkbox ${selectedPlayers.has(p.id)?'selected':''}">
       <input type="checkbox" ${selectedPlayers.has(p.id)?'checked':''} onchange="togglePlayer('${p.id}',this)">
       <div class="player-avatar" style="width:30px;height:30px;font-size:11px;">${initials(p.name)}</div>
