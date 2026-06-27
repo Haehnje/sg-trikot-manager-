@@ -468,6 +468,20 @@
   .match-row.q-perfect { border-color: #3b6d11; border-left: 3px solid #3b6d11; }
   .match-row.q-partial { border-color: #a0660a; border-left: 3px solid #a0660a; }
   .match-row.q-manual  { border-left: 3px solid var(--accent); }
+  /* Export/Import format buttons */
+  .format-btn {
+    display: flex; align-items: center; gap: 14px;
+    width: 100%; background: var(--surface-alt);
+    border: 0.5px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; cursor: pointer; text-align: left;
+    transition: background 0.15s, border-color 0.15s;
+    color: var(--text);
+  }
+  .format-btn:hover { background: var(--bg); border-color: var(--accent); }
+  .format-icon { font-size: 26px; flex-shrink: 0; line-height: 1; }
+  /* Player row: always horizontal buttons */
+  .player-actions { display: flex; gap: 5px; flex-direction: row !important; align-items: center; flex-shrink: 0; }
+  .player-actions .btn-sm { padding: 6px 10px; font-size: 15px; line-height: 1; }
   /* Drawer nav items */
   .drawer-item {
     display: flex; align-items: center; gap: 14px;
@@ -589,15 +603,12 @@
 </div>
 
 <div id="page-players" class="page">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;gap:8px;flex-wrap:wrap;">
     <h2 style="margin:0">Spieler</h2>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button class="btn" onclick="exportJSON()">⬇ JSON</button>
-      <button class="btn" onclick="exportCSV()">⬇ CSV</button>
-      <button class="btn" onclick="downloadCSVTemplate()" title="Leere CSV-Vorlage für Excel">⬇ CSV-Vorlage</button>
-      <label class="btn" style="cursor:pointer;">⬆ JSON<input type="file" accept=".json" onchange="importJSON(event)" style="display:none;"></label>
-      <label class="btn" style="cursor:pointer;">⬆ CSV<input type="file" accept=".csv,.txt" onchange="importCSV(event)" style="display:none;"></label>
-      <button class="btn btn-primary" onclick="openAddPlayerModal()">+ Spieler hinzufügen</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn" onclick="openModal('modal-export')">⬇ Export</button>
+      <button class="btn" onclick="openModal('modal-import')">⬆ Import</button>
+      <button class="btn btn-primary" onclick="openAddPlayerModal()">+ Neu</button>
     </div>
   </div>
   <div id="players-list"></div>
@@ -877,6 +888,67 @@
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-jersey')">Abbrechen</button>
       <button class="btn btn-primary" onclick="saveJersey()">Hinzufügen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Export -->
+<div class="modal-overlay" id="modal-export">
+  <div class="modal" style="max-width:380px;">
+    <h3 style="margin-bottom:1rem;">Export</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="format-btn" onclick="exportJSON();closeModal('modal-export')">
+        <div class="format-icon">📦</div>
+        <div>
+          <div style="font-weight:600;font-size:15px;">JSON – Vollständige Sicherung</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Trikotsätze, Spieler & Vorlagen · ideal zum Übertragen auf ein anderes Gerät</div>
+        </div>
+      </button>
+      <button class="format-btn" onclick="exportCSV();closeModal('modal-export')">
+        <div class="format-icon">📊</div>
+        <div>
+          <div style="font-weight:600;font-size:15px;">CSV – Spielerliste</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Nur Spieler · öffnet sich in Excel</div>
+        </div>
+      </button>
+      <button class="format-btn" onclick="downloadCSVTemplate();closeModal('modal-export')">
+        <div class="format-icon">📋</div>
+        <div>
+          <div style="font-weight:600;font-size:15px;">CSV-Vorlage (leer)</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Leere Tabelle zum Ausfüllen in Excel</div>
+        </div>
+      </button>
+    </div>
+    <div class="modal-footer" style="margin-top:1.25rem;">
+      <button class="btn" onclick="closeModal('modal-export')">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Import -->
+<div class="modal-overlay" id="modal-import">
+  <div class="modal" style="max-width:380px;">
+    <h3 style="margin-bottom:1rem;">Import</h3>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <label class="format-btn" style="cursor:pointer;">
+        <div class="format-icon">📦</div>
+        <div>
+          <div style="font-weight:600;font-size:15px;">JSON – Vollständige Sicherung</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Überschreibt alle Daten · stellt einen gesicherten Stand wieder her</div>
+        </div>
+        <input type="file" accept=".json" onchange="importJSON(event);closeModal('modal-import')" style="display:none;">
+      </label>
+      <label class="format-btn" style="cursor:pointer;">
+        <div class="format-icon">📊</div>
+        <div>
+          <div style="font-weight:600;font-size:15px;">CSV – Spielerliste</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Fügt neue Spieler hinzu · aktualisiert bestehende per Name</div>
+        </div>
+        <input type="file" accept=".csv,.txt" onchange="importCSV(event);closeModal('modal-import')" style="display:none;">
+      </label>
+    </div>
+    <div class="modal-footer" style="margin-top:1.25rem;">
+      <button class="btn" onclick="closeModal('modal-import')">Schließen</button>
     </div>
   </div>
 </div>

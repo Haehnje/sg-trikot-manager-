@@ -1,4 +1,4 @@
-const CACHE = "trikot-v13";
+const CACHE = "trikot-v14";
 const FILES = ["./Trikot-Manager.html", "./manifest.json", "./icon.png"];
 
 self.addEventListener("install", e => {
