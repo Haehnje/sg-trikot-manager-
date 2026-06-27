@@ -881,6 +881,20 @@
   </div>
 </div>
 
+<!-- Modal: Bild-Vorschau -->
+<div class="modal-overlay" id="modal-preview">
+  <div class="modal" style="max-width:520px;">
+    <h3 style="margin-bottom:0.75rem;">Vorschau</h3>
+    <div style="border-radius:8px;overflow:hidden;border:0.5px solid var(--border);margin-bottom:1rem;">
+      <img id="preview-img" style="width:100%;display:block;" alt="Aufstellung Vorschau">
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-preview')">Abbrechen</button>
+      <button class="btn btn-primary" onclick="downloadPreviewImage()">⬇ Herunterladen</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Trikot reservieren -->
 <div class="modal-overlay" id="modal-reserve">
   <div class="modal">
@@ -906,6 +920,15 @@ let editSetId = null, editPlayerId = null, jerseyTargetSetId = null;
 let selectedPlayers = new Set();
 let lastMatchResults = { results: [], unmatched: [] };
 let manualResults = [], manualUnmatched = [], manualSetJerseys = [];
+let _previewDataUrl = null, _previewFilename = 'Aufstellung.png';
+function downloadPreviewImage() {
+  if (!_previewDataUrl) return;
+  const a = document.createElement('a');
+  a.download = _previewFilename;
+  a.href = _previewDataUrl;
+  a.click();
+  closeModal('modal-preview');
+}
 let collapsedSets = new Set();
 let collapsedVorlagen = new Set();
 
@@ -1337,7 +1360,7 @@ function renderPlayers() {
         </div>
         <div class="player-actions">
           <button class="btn btn-sm" onclick="toggleActive('${p.id}')" title="${isActive ? 'Inaktiv setzen' : 'Aktiv setzen'}">
-            <span>${isActive ? '⏸' : '▶'}</span><span class="player-btn-label"> ${isActive ? 'Inaktiv' : 'Aktiv'}</span>
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:${isActive?'#3b6d11':'#cc0000'};color:#fff;font-size:11px;font-weight:700;flex-shrink:0;">${isActive?'A':'I'}</span><span class="player-btn-label"> ${isActive ? 'Inaktiv' : 'Aktiv'}</span>
           </button>
           <button class="btn btn-sm" onclick="openEditPlayerModal('${p.id}')" title="Bearbeiten">
             <span>✏️</span><span class="player-btn-label"> Bearbeiten</span>
@@ -2018,10 +2041,10 @@ function exportSheet(mode) {
   html2canvas(sheet, {scale:2, backgroundColor:'#ffffff', useCORS:true, allowTaint:true, logging:false}).then(canvas => {
     sheet.style.display = 'none';
     if (mode === 'image') {
-      const a = document.createElement('a');
-      a.download = 'Aufstellung' + (dateVal?'-'+dateVal:'') + '.png';
-      a.href = canvas.toDataURL('image/png');
-      a.click();
+      _previewDataUrl = canvas.toDataURL('image/png');
+      _previewFilename = 'Aufstellung' + (dateVal?'-'+dateVal:'') + '.png';
+      document.getElementById('preview-img').src = _previewDataUrl;
+      openModal('modal-preview');
     } else {
       const {jsPDF} = window.jspdf;
       const pdf = new jsPDF({orientation:'portrait', unit:'mm', format:'a4'});
