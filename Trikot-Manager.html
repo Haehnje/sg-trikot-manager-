@@ -73,16 +73,88 @@
   }
   nav button:hover { background: rgba(255,255,255,0.1); color: #fff; }
   nav button.active { background: var(--accent); color: #fff; font-weight: 500; }
-  @media (max-width: 480px) {
-    header { padding: 0 1rem; gap: 8px; }
-    header h1 { font-size: 14px; }
-    nav button { padding: 6px 10px; font-size: 13px; }
-    main { padding: 1rem; }
-    .card { padding: 1rem; }
+  /* ===== BOTTOM NAV (mobile only) ===== */
+  #bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #111;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    z-index: 200;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  #bottom-nav button {
+    flex: 1;
+    background: none; border: none;
+    color: rgba(255,255,255,0.45);
+    padding: 9px 4px 8px;
+    font-size: 10px;
+    cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    line-height: 1.2; transition: color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #bottom-nav button.active { color: var(--accent); }
+  #bottom-nav button .nav-icon { font-size: 20px; line-height: 1; }
+  /* Mobile icon-only player buttons */
+  .player-actions { display: flex; gap: 6px; }
+  .player-btn-label { }
+
+  @media (max-width: 640px) {
+    /* Hide top nav, show bottom bar */
+    nav { display: none !important; }
+    .theme-toggle { font-size: 11px; padding: 3px 7px; margin-left: 4px; }
+    header { height: 52px; padding: 0 0.875rem; gap: 8px; }
+    header h1 { font-size: 13px; }
+    header .club-sub { display: none; }
+    #bottom-nav { display: flex; }
+
+    /* Main padding for bottom nav + safe area */
+    main { padding: 0.875rem 0.875rem calc(72px + env(safe-area-inset-bottom, 0px)); }
+    .card { padding: 0.875rem 1rem; }
+    h2 { font-size: 16px; margin-bottom: 1rem; }
+
+    /* Compact player rows on mobile */
+    .player-row { gap: 8px; padding: 8px 0; align-items: flex-start; }
+    .player-btn-label { display: none; }
+    .player-actions { gap: 4px; flex-direction: column; }
+    .player-actions .btn-sm { padding: 5px 8px; font-size: 18px; line-height: 1; }
+
+    /* Modals slide up from bottom */
+    .modal-overlay { align-items: flex-end; padding: 0; }
+    .modal {
+      padding: 1.25rem;
+      border-radius: 20px 20px 0 0;
+      max-height: 90dvh;
+      overflow-y: auto;
+      width: 100%;
+    }
+
+    /* Stats grid 3 columns on mobile */
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+    .stat-card { padding: 10px; }
+    .stat-card .stat-num { font-size: 20px; }
+
+    /* Jersey select in match row */
+    .jersey-select { max-width: 140px !important; }
+
     .inline-form { grid-template-columns: 1fr 1fr; }
-    .stats-row { grid-template-columns: 1fr 1fr 1fr; }
-    .match-row { padding: 8px; }
-    .modal { padding: 1.25rem; }
+    .inline-form .btn { grid-column: span 2; }
+    .match-row { padding: 8px 10px; gap: 8px; }
+
+    /* Form rows single column */
+    .form-row { grid-template-columns: 1fr; }
+
+    /* Card header: allow wrap for long set names */
+    .card-header { flex-wrap: wrap; gap: 6px; }
+    .set-actions { flex-wrap: wrap; gap: 4px; }
+
+    /* History rows compact */
+    .history-row { font-size: 12px; }
+  }
+  @media (max-width: 360px) {
+    main { padding: 0.75rem 0.75rem calc(72px + env(safe-area-inset-bottom, 0px)); }
+    .card { padding: 0.75rem; }
   }
   main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
   .page { display: none; }
@@ -376,6 +448,48 @@
   .size-tag.chosen { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-text); font-weight: 500; }
   .filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
   .match-result-star { color: #eaad2b; font-size: 16px; }
+  /* Dark mode */
+  [data-theme="dark"] {
+    --bg: #111111;
+    --surface: #1c1c1e;
+    --surface-alt: #2c2c2e;
+    --border: rgba(255,255,255,0.1);
+    --border-strong: rgba(255,255,255,0.18);
+    --text: #f0f0f0;
+    --text-muted: #8e8e93;
+    --accent-bg: rgba(204,0,0,0.18);
+    --accent-text: #ff6b6b;
+    --success-bg: rgba(59,109,17,0.18);
+    --warning-bg: rgba(133,79,11,0.18);
+    --danger-bg: rgba(153,0,0,0.18);
+  }
+  [data-theme="dark"] header { background: #000; }
+  /* Match-row quality border */
+  .match-row.q-perfect { border-color: #3b6d11; border-left: 3px solid #3b6d11; }
+  .match-row.q-partial { border-color: #a0660a; border-left: 3px solid #a0660a; }
+  .match-row.q-manual  { border-left: 3px solid var(--accent); }
+  /* Theme toggle */
+  .theme-toggle {
+    background: none; border: 1px solid rgba(255,255,255,0.25); border-radius: 20px;
+    color: rgba(255,255,255,0.7); padding: 4px 10px; cursor: pointer; font-size: 13px;
+    margin-left: 8px; white-space: nowrap;
+  }
+  .theme-toggle:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  /* Player photo */
+  .player-photo {
+    width: 36px; height: 36px; border-radius: 50%;
+    object-fit: cover; flex-shrink: 0;
+  }
+  /* Jersey reserved chip */
+  .jersey-chip.reserved { border-color: var(--gold); background: rgba(201,162,39,0.12); }
+  .jersey-chip.reserved .num { color: var(--gold); }
+  /* History card */
+  .history-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 0; border-bottom: 0.5px solid var(--border);
+    font-size: 13px;
+  }
+  .history-row:last-child { border-bottom: none; }
   @media (max-width: 600px) {
     .form-row { grid-template-columns: 1fr; }
     .inline-form { grid-template-columns: 1fr 1fr; }
@@ -399,6 +513,7 @@
     <button onclick="showPage('lineup')">Aufstellung</button>
     <button onclick="showPage('guide')">Anleitung</button>
   </nav>
+  <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">☀ Hell</button>
 </header>
 
 <main>
@@ -504,6 +619,22 @@
       </div>
       <div class="stats-row" id="match-stats"></div>
       <div id="match-result-list"></div>
+    </div>
+  </div>
+
+  <!-- Aufstellungshistorie -->
+  <div id="history-section" style="margin-top:0.5rem;display:none;">
+    <div class="card" style="overflow:hidden;">
+      <div class="card-header" style="cursor:pointer;" onclick="toggleHistoryCollapse()">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span id="history-chevron" style="font-size:12px;color:var(--text-muted);user-select:none;">▶</span>
+          <strong style="font-size:15px;">Letzte Aufstellungen</strong>
+          <span id="history-count-badge" class="badge badge-blue">0</span>
+        </div>
+      </div>
+      <div id="history-body" style="display:none;margin-top:1rem;">
+        <div id="history-list"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -627,6 +758,20 @@
         <input type="number" id="player-num-input" placeholder="z.B. 10" min="1" max="99">
       </div>
     </div>
+    <div class="form-group">
+      <label>Foto (optional)</label>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
+        <div id="photo-preview-wrap" style="width:52px;height:52px;border-radius:50%;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--accent-text);overflow:hidden;flex-shrink:0;">
+          <span id="photo-preview-initials">?</span>
+          <img id="photo-preview-img" style="display:none;width:52px;height:52px;object-fit:cover;">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <button type="button" class="btn btn-sm" onclick="document.getElementById('photo-file-input').click()">📷 Foto wählen</button>
+          <button type="button" class="btn btn-sm btn-danger" id="photo-remove-btn" onclick="clearPhotoPreview()" style="display:none;">Entfernen</button>
+        </div>
+        <input type="file" id="photo-file-input" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+      </div>
+    </div>
     <div class="modal-footer">
       <button class="btn" onclick="closeModal('modal-player')">Abbrechen</button>
       <button class="btn btn-primary" onclick="savePlayer()">Speichern</button>
@@ -684,6 +829,24 @@
   </div>
 </div>
 
+<!-- Modal: Trikot reservieren -->
+<div class="modal-overlay" id="modal-reserve">
+  <div class="modal">
+    <h3>Trikot reservieren</h3>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:1rem;">Dieses Trikot wird beim automatischen Matching immer zuerst dem gewählten Spieler zugewiesen.</p>
+    <div class="form-group">
+      <label>Spieler</label>
+      <select id="reserve-player-select">
+        <option value="">— Keine Reservierung —</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-reserve')">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveReservation()">Speichern</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SIZES = ['XS','S','M','L','XL','XXL','3XL'];
 let db = load();
@@ -696,10 +859,29 @@ let collapsedVorlagen = new Set();
 
 function load() {
   try {
-    const d = JSON.parse(localStorage.getItem('trikot-db') || 'null') || { sets: [], players: [], lineups: [] };
+    const d = JSON.parse(localStorage.getItem('trikot-db') || 'null') || { sets: [], players: [], lineups: [], history: [] };
     if (!d.lineups) d.lineups = [];
+    if (!d.history) d.history = [];
     return d;
-  } catch(e) { return { sets: [], players: [], lineups: [] }; }
+  } catch(e) { return { sets: [], players: [], lineups: [], history: [] }; }
+}
+
+// ---- DARK MODE ----
+(function() {
+  const t = localStorage.getItem('trikot-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+  document.addEventListener('DOMContentLoaded', () => updateThemeBtn(t));
+})();
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme') || 'light';
+  const next = cur === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('trikot-theme', next);
+  updateThemeBtn(next);
+}
+function updateThemeBtn(t) {
+  const btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = t === 'dark' ? '☀ Hell' : '🌙 Dunkel';
 }
 function save() { localStorage.setItem('trikot-db', JSON.stringify(db)); }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
@@ -708,9 +890,16 @@ function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  const btns = document.querySelectorAll('nav button');
+  // top nav
+  const btns = document.querySelectorAll('nav:not(#bottom-nav) button');
   const idx = {sets:0, players:1, vorlagen:2, lineup:3, guide:4}[name];
-  if (idx !== undefined) btns[idx].classList.add('active');
+  if (idx !== undefined && btns[idx]) btns[idx].classList.add('active');
+  // bottom nav
+  document.querySelectorAll('#bottom-nav button').forEach(b => b.classList.remove('active'));
+  const bnavBtn = document.getElementById('bnav-' + name);
+  if (bnavBtn) bnavBtn.classList.add('active');
+  // scroll to top
+  window.scrollTo(0, 0);
   if (name === 'sets') renderSets();
   if (name === 'players') renderPlayers();
   if (name === 'vorlagen') renderVorlagen();
@@ -924,13 +1113,15 @@ function renderSets() {
   el.innerHTML = db.sets.map(s => {
     const collapsed = collapsedSets.has(s.id);
     const chevron = collapsed ? '▶' : '▼';
+    const reservedCount = s.jerseys.filter(j => j.reservedFor).length;
     const body = collapsed ? '' : `<div class="collapsible-body">${s.jerseys.length ? renderJerseyGrid(s) : '<p style="font-size:13px;color:var(--text-muted);">Noch keine Trikots in diesem Satz.</p>'}</div>`;
     return `<div class="card" style="overflow:hidden;">
       <div class="card-header" style="cursor:pointer;" onclick="toggleSetCollapse('${s.id}')">
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <span style="font-size:12px;color:var(--text-muted);user-select:none;">${chevron}</span>
           <strong style="font-size:15px;">${esc(s.name)}</strong>
           <span class="badge badge-blue">${s.jerseys.length} Trikots</span>
+          ${reservedCount ? `<span class="badge" style="background:rgba(201,162,39,0.15);color:var(--gold);">🔒 ${reservedCount} reserviert</span>` : ''}
         </div>
         <div class="set-actions" onclick="event.stopPropagation()">
           <button class="btn btn-sm" onclick="openAddJerseyModal('${s.id}')">+ Trikot</button>
@@ -950,16 +1141,41 @@ function renderJerseyGrid(s) {
     <div style="margin-bottom:8px;">
       <div class="section-divider">${sz}</div>
       <div class="jersey-grid">
-        ${grouped[sz].map(j => `
-          <div class="jersey-chip">
+        ${grouped[sz].map(j => {
+          const res = j.reservedFor ? db.players.find(p => p.id === j.reservedFor) : null;
+          const isRes = !!res;
+          return `<div class="jersey-chip${isRes ? ' reserved' : ''}" title="${isRes ? 'Reserviert für: ' + res.name : ''}">
             <span class="num">${j.number}</span>
             <span class="size">${j.size}</span>
-            <button class="del" onclick="deleteJersey('${s.id}','${j.id}')" title="Entfernen">×</button>
-          </div>
-        `).join('')}
+            ${isRes ? `<span style="font-size:9px;color:var(--gold);margin-top:1px;max-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">🔒 ${esc(res.name.split(' ')[0])}</span>` : ''}
+            <div style="display:flex;gap:2px;margin-top:2px;">
+              <button class="del" onclick="deleteJersey('${s.id}','${j.id}')" title="Entfernen" style="position:static;display:flex;">×</button>
+              <button style="width:18px;height:18px;border-radius:50%;background:${isRes?'rgba(201,162,39,0.2)':'var(--surface-alt)'};color:${isRes?'var(--gold)':'var(--text-muted)'};border:0.5px solid var(--border);cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;" onclick="openReserveModal('${s.id}','${j.id}')" title="Reservieren">🔒</button>
+            </div>
+          </div>`;
+        }).join('')}
       </div>
     </div>
   `).join('');
+}
+
+// ---- RESERVIERUNGEN ----
+let _reserveSetId = null, _reserveJerseyId = null;
+function openReserveModal(setId, jerseyId) {
+  _reserveSetId = setId; _reserveJerseyId = jerseyId;
+  const j = db.sets.find(s => s.id === setId)?.jerseys.find(j => j.id === jerseyId);
+  const sel = document.getElementById('reserve-player-select');
+  const sorted = [...db.players].filter(p => p.active !== false).sort((a,b) => a.name.localeCompare(b.name,'de'));
+  sel.innerHTML = '<option value="">— Keine Reservierung —</option>' +
+    sorted.map(p => `<option value="${p.id}" ${j?.reservedFor === p.id ? 'selected' : ''}>${esc(p.name)} (${p.size})</option>`).join('');
+  openModal('modal-reserve');
+}
+function saveReservation() {
+  const playerId = document.getElementById('reserve-player-select').value || null;
+  const s = db.sets.find(s => s.id === _reserveSetId);
+  const j = s?.jerseys.find(j => j.id === _reserveJerseyId);
+  if (j) { j.reservedFor = playerId || undefined; }
+  save(); closeModal('modal-reserve'); renderSets();
 }
 
 function openNewSetModal() {
@@ -1028,21 +1244,69 @@ function renderPlayers() {
   el.innerHTML = `<div class="card"><div>${
     sorted.map(p => {
       const isActive = p.active !== false;
+      const avatarHtml = p.photo
+        ? `<img class="player-photo" src="${p.photo}" alt="${esc(p.name)}">`
+        : `<div class="player-avatar" style="background:${isActive ? 'var(--accent-bg)' : 'var(--surface-alt)'};">${initials(p.name)}</div>`;
       return `<div class="player-row" style="${isActive ? '' : 'opacity:0.5;'}">
-        <div class="player-avatar" style="background:${isActive ? 'var(--accent-bg)' : 'var(--surface-alt)'};">${initials(p.name)}</div>
+        ${avatarHtml}
         <div class="player-info">
           <div class="player-name">${esc(p.name)} <span class="badge ${isActive ? 'badge-green' : ''}" style="${isActive ? '' : 'background:#eee;color:#999;'}">${isActive ? 'Aktiv' : 'Inaktiv'}</span></div>
           <div class="player-meta">Größe: <strong>${p.size}</strong> · Wunschnummer: <strong>${p.preferredNumber || '—'}</strong></div>
           ${(()=>{ const vl = db.lineups.filter(l=>l.playerIds.includes(p.id)).map(l=>l.name); return vl.length ? `<div style="font-size:11px;color:var(--text-muted);margin-top:1px;">Vorlagen: ${vl.map(n=>`<span style="background:#f0f0f0;border-radius:4px;padding:0 5px;">${esc(n)}</span>`).join(' ')}</div>` : ''; })()}
         </div>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-sm" onclick="toggleActive('${p.id}')">${isActive ? 'Inaktiv setzen' : 'Aktiv setzen'}</button>
-          <button class="btn btn-sm" onclick="openEditPlayerModal('${p.id}')">Bearbeiten</button>
-          <button class="btn btn-sm btn-danger" onclick="deletePlayer('${p.id}')">Löschen</button>
+        <div class="player-actions">
+          <button class="btn btn-sm" onclick="toggleActive('${p.id}')" title="${isActive ? 'Inaktiv setzen' : 'Aktiv setzen'}">
+            <span>${isActive ? '⏸' : '▶'}</span><span class="player-btn-label"> ${isActive ? 'Inaktiv' : 'Aktiv'}</span>
+          </button>
+          <button class="btn btn-sm" onclick="openEditPlayerModal('${p.id}')" title="Bearbeiten">
+            <span>✏️</span><span class="player-btn-label"> Bearbeiten</span>
+          </button>
+          <button class="btn btn-sm btn-danger" onclick="deletePlayer('${p.id}')" title="Löschen">
+            <span>🗑️</span><span class="player-btn-label"> Löschen</span>
+          </button>
         </div>
       </div>`;
     }).join('')}
   </div></div>`;
+}
+
+// ---- PLAYER PHOTOS ----
+let _pendingPhoto = undefined; // undefined = no change, null = remove, string = new base64
+
+function previewPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    _pendingPhoto = e.target.result;
+    document.getElementById('photo-preview-img').src = _pendingPhoto;
+    document.getElementById('photo-preview-img').style.display = 'block';
+    document.getElementById('photo-preview-initials').style.display = 'none';
+    document.getElementById('photo-remove-btn').style.display = '';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function clearPhotoPreview() {
+  _pendingPhoto = null;
+  document.getElementById('photo-preview-img').style.display = 'none';
+  document.getElementById('photo-preview-initials').style.display = '';
+  document.getElementById('photo-remove-btn').style.display = 'none';
+  document.getElementById('photo-file-input').value = '';
+}
+function setupPhotoPreview(player) {
+  _pendingPhoto = undefined;
+  document.getElementById('photo-file-input').value = '';
+  const hasPhoto = player && player.photo;
+  const img = document.getElementById('photo-preview-img');
+  const ini = document.getElementById('photo-preview-initials');
+  const rmb = document.getElementById('photo-remove-btn');
+  if (hasPhoto) {
+    img.src = player.photo; img.style.display = 'block';
+    ini.style.display = 'none'; rmb.style.display = '';
+  } else {
+    img.style.display = 'none'; ini.style.display = '';
+    ini.textContent = player ? initials(player.name) : '?';
+    rmb.style.display = 'none';
+  }
 }
 
 function openAddPlayerModal() {
@@ -1051,6 +1315,7 @@ function openAddPlayerModal() {
   document.getElementById('player-name-input').value = '';
   document.getElementById('player-size-input').value = 'M';
   document.getElementById('player-num-input').value = '';
+  setupPhotoPreview(null);
   openModal('modal-player');
   setTimeout(() => document.getElementById('player-name-input').focus(), 100);
 }
@@ -1061,6 +1326,7 @@ function openEditPlayerModal(id) {
   document.getElementById('player-name-input').value = p.name;
   document.getElementById('player-size-input').value = p.size;
   document.getElementById('player-num-input').value = p.preferredNumber || '';
+  setupPhotoPreview(p);
   openModal('modal-player');
 }
 function savePlayer() {
@@ -1072,9 +1338,10 @@ function savePlayer() {
   if (preferredNumber && (preferredNumber < 1 || preferredNumber > 99)) { alert('Ungültige Wunschnummer (1–99).'); return; }
   if (editPlayerId) {
     const p = db.players.find(x => x.id === editPlayerId);
-    Object.assign(p, { name, size, preferredNumber });
+    const photo = _pendingPhoto === undefined ? p.photo : (_pendingPhoto || undefined);
+    Object.assign(p, { name, size, preferredNumber, photo });
   } else {
-    db.players.push({ id: uid(), name, size, preferredNumber, active: true });
+    db.players.push({ id: uid(), name, size, preferredNumber, active: true, photo: _pendingPhoto || undefined });
   }
   save(); closeModal('modal-player'); renderPlayers();
 }
@@ -1086,6 +1353,51 @@ function deletePlayer(id) {
 }
 
 // ---- LINEUP ----
+// ---- HISTORY ----
+let _historyCollapsed = true;
+function toggleHistoryCollapse() {
+  _historyCollapsed = !_historyCollapsed;
+  document.getElementById('history-chevron').textContent = _historyCollapsed ? '▶' : '▼';
+  document.getElementById('history-body').style.display = _historyCollapsed ? 'none' : '';
+}
+function renderHistory() {
+  const sec = document.getElementById('history-section');
+  if (!sec) return;
+  if (!db.history.length) { sec.style.display = 'none'; return; }
+  sec.style.display = '';
+  document.getElementById('history-count-badge').textContent = db.history.length;
+  const list = document.getElementById('history-list');
+  list.innerHTML = db.history.map((h, i) => {
+    const d = h.dateVal ? new Date(h.dateVal).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+    const title = [h.mannschaft, h.opponent ? 'vs. '+h.opponent : ''].filter(Boolean).join(' · ') || 'Aufstellung';
+    const collapsed = !h._open;
+    return `<div style="margin-bottom:6px;border:0.5px solid var(--border);border-radius:8px;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;background:var(--surface-alt);" onclick="toggleHistoryEntry(${i})">
+        <span style="font-size:11px;color:var(--text-muted);">${collapsed?'▶':'▼'}</span>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;">${esc(title)}</div>
+          <div style="font-size:11px;color:var(--text-muted);">${d} · ${h.setName||''} · ${h.rows.length} Spieler</div>
+        </div>
+        <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deleteHistory(${i})" style="padding:2px 7px;font-size:11px;">×</button>
+      </div>
+      ${collapsed ? '' : `<div style="padding:8px 12px;">
+        ${h.rows.sort((a,b)=>a.name.localeCompare(b.name,'de')).map(r =>
+          `<div class="history-row"><span style="flex:1;">${esc(r.name)}</span><span class="badge badge-blue">#${r.number} ${r.size}</span></div>`
+        ).join('')}
+        ${h.unmatched.length ? `<div style="font-size:12px;color:var(--danger);margin-top:4px;">Ohne Trikot: ${h.unmatched.join(', ')}</div>` : ''}
+      </div>`}
+    </div>`;
+  }).join('');
+}
+function toggleHistoryEntry(i) {
+  db.history[i]._open = !db.history[i]._open;
+  renderHistory();
+}
+function deleteHistory(i) {
+  db.history.splice(i, 1);
+  save(); renderHistory();
+}
+
 function renderLineup() {
   const sel = document.getElementById('lineup-set-select');
   const cur = sel.value;
@@ -1097,9 +1409,9 @@ function renderLineup() {
     vsel.innerHTML = '<option value="">— Vorlage laden —</option>' +
       db.lineups.map(l => `<option value="${l.id}" ${l.id===vcur?'selected':''}>${esc(l.name)} (${l.playerIds.length} Spieler)</option>`).join('');
   }
-  // Mannschaft-Datalist aus Vorlagen befüllen
   const dl = document.getElementById('mannschaft-list');
   if (dl) dl.innerHTML = db.lineups.map(l => `<option value="${esc(l.name)}">`).join('');
+  renderHistory();
   onSetSelected();
 }
 function onSetSelected() {
@@ -1146,9 +1458,12 @@ function renderPlayerSelect() {
   }
   el.innerHTML = filtered.map(p => {
     const isActive = p.active !== false;
+    const avatarHtml = p.photo
+      ? `<img class="player-photo" src="${p.photo}" alt="${esc(p.name)}" style="width:30px;height:30px;">`
+      : `<div class="player-avatar" style="width:30px;height:30px;font-size:11px;">${initials(p.name)}</div>`;
     return `<label class="player-checkbox ${selectedPlayers.has(p.id)?'selected':''}">
       <input type="checkbox" ${selectedPlayers.has(p.id)?'checked':''} onchange="togglePlayer('${p.id}',this)">
-      <div class="player-avatar" style="width:30px;height:30px;font-size:11px;">${initials(p.name)}</div>
+      ${avatarHtml}
       <div>
         <div style="font-size:14px;font-weight:500;">${esc(p.name)} <span style="font-size:11px;padding:1px 6px;border-radius:10px;font-weight:400;${isActive?'background:#eaf3de;color:#3b6d11;':'background:#eee;color:#888;'}">${isActive?'Aktiv':'Inaktiv'}</span></div>
         <div style="font-size:12px;color:var(--text-muted);">Größe ${p.size}${p.preferredNumber ? ' · Wunsch: #'+p.preferredNumber : ''}</div>
@@ -1189,13 +1504,23 @@ function runMatch() {
   const results = [];
   const unmatched = [];
 
+  // Pass 0: reserved jerseys → always to reserved player (if selected)
+  jerseys.forEach(j => {
+    if (!j.reservedFor) return;
+    const p = players.find(p => p.id === j.reservedFor);
+    if (p && !results.find(r => r.player.id === p.id)) {
+      j.taken = true;
+      results.push({player: p, jersey: j, quality: 'reserved'});
+    }
+  });
   // Pass 1: preferred number + correct size
   players.forEach(p => {
+    if (results.find(r => r.player.id === p.id)) return;
     if (!p.preferredNumber) return;
     const j = jerseys.find(j => !j.taken && j.number === p.preferredNumber && j.size === p.size);
     if (j) { j.taken = true; results.push({player: p, jersey: j, quality: 'perfect'}); }
   });
-  // Pass 2: preferred number + wrong size (fallback)
+  // Pass 2: preferred number + wrong size
   players.forEach(p => {
     if (results.find(r => r.player.id === p.id)) return;
     if (!p.preferredNumber) return;
@@ -1213,12 +1538,24 @@ function runMatch() {
     if (!results.find(r => r.player.id === p.id)) unmatched.push(p);
   });
 
-  const perfect = results.filter(r => r.quality==='perfect').length;
-  const partial = results.filter(r => r.quality!=='perfect').length;
-
   manualResults = results.map(r => ({player: {...r.player}, jersey: {...r.jersey}, quality: r.quality}));
   manualUnmatched = unmatched.map(p => ({...p}));
   manualSetJerseys = jerseys;
+
+  // Aufstellungshistorie speichern
+  const mannschaft = document.getElementById('game-mannschaft')?.value.trim() || '';
+  const opponent   = document.getElementById('game-opponent')?.value.trim() || '';
+  const dateVal    = document.getElementById('game-date')?.value || '';
+  db.history.unshift({
+    id: uid(), ts: Date.now(),
+    mannschaft, opponent, dateVal, setName: s.name,
+    rows: results.map(r => ({name: r.player.name, number: r.jersey.number, size: r.jersey.size})),
+    unmatched: unmatched.map(p => p.name)
+  });
+  if (db.history.length > 10) db.history = db.history.slice(0, 10);
+  save();
+  renderHistory();
+
   document.getElementById('match-result-card').style.display = 'block';
   renderManualResult();
 }
@@ -1246,15 +1583,17 @@ function renderManualResult() {
   const sortedUnmatched = [...manualUnmatched].sort((a,b) => a.name.localeCompare(b.name,'de'));
 
   let html = sortedResults.map(r => {
-    const isPerfect = r.quality==='perfect', isNumOnly = r.quality==='num-only';
-    const jClass = isPerfect ? '' : 'warning-jersey';
-    return `<div class="match-row">
+    const q = r.quality;
+    const jClass = (q==='perfect'||q==='reserved') ? '' : 'warning-jersey';
+    const rowClass = q==='perfect' ? 'q-perfect' : q==='reserved' ? 'q-perfect' : q==='manual' ? 'q-manual' : 'q-partial';
+    const qLabel = q==='reserved' ? '🔒' : q==='perfect' ? '✓' : q==='num-only' ? '≈ Nr.' : q==='size-only' ? '≈ Gr.' : '';
+    return `<div class="match-row ${rowClass}">
       <div class="match-jersey ${jClass}">
         <div class="n">${r.jersey.number}</div>
         <div class="s">${r.jersey.size}</div>
       </div>
       <div style="flex:1;">
-        <div style="font-weight:500;font-size:14px;">${esc(r.player.name)}</div>
+        <div style="font-weight:500;font-size:14px;">${esc(r.player.name)} ${qLabel?`<span style="font-size:11px;opacity:.65;">${qLabel}</span>`:''}</div>
         <div style="font-size:12px;color:var(--text-muted);">Größe ${r.player.size}${r.player.preferredNumber?' · Wunsch #'+r.player.preferredNumber:''}</div>
       </div>
       ${jerseySelect(r.jersey.id, r.player.id)}
@@ -1646,6 +1985,31 @@ if (!db.sets.length && !db.players.length) {
 }
 </script>
 <div id="export-sheet" style="display:none;position:fixed;left:-9999px;top:0;width:600px;padding:32px;background:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;"></div>
+
+<!-- Bottom Navigation (mobile only) -->
+<nav id="bottom-nav">
+  <button onclick="showPage('sets')" id="bnav-sets">
+    <span class="nav-icon">👕</span>
+    <span>Trikots</span>
+  </button>
+  <button onclick="showPage('players')" id="bnav-players">
+    <span class="nav-icon">👥</span>
+    <span>Spieler</span>
+  </button>
+  <button onclick="showPage('vorlagen')" id="bnav-vorlagen">
+    <span class="nav-icon">📋</span>
+    <span>Vorlagen</span>
+  </button>
+  <button onclick="showPage('lineup')" id="bnav-lineup">
+    <span class="nav-icon">⚽</span>
+    <span>Spiel</span>
+  </button>
+  <button onclick="showPage('guide')" id="bnav-guide">
+    <span class="nav-icon">ℹ️</span>
+    <span>Info</span>
+  </button>
+</nav>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
