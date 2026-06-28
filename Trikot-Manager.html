@@ -508,15 +508,26 @@
   .match-section-header h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
   .match-action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
   .match-row {
-    display: grid;
-    grid-template-columns: 56px 1fr auto;
-    gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     padding: 12px 14px;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 0.5px solid var(--border);
     margin-bottom: 8px;
-    background: var(--surface-alt);
+    background: var(--surface);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .match-row-top {
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .match-row-bottom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
   .match-jersey {
     width: 56px; height: 56px;
@@ -531,7 +542,7 @@
   .match-jersey.perfect-jersey { background: var(--success-bg); }
   .match-jersey.perfect-jersey .n, .match-jersey.perfect-jersey .s { color: var(--success); opacity: 1; }
   .match-player-info { flex: 1; min-width: 0; }
-  .match-player-name { font-weight: 600; font-size: 14px; word-break: break-word; line-height: 1.3; }
+  .match-player-name { font-weight: 700; font-size: 16px; word-break: break-word; line-height: 1.2; letter-spacing: -0.01em; }
   .match-player-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
   .match-quality-badge { font-size: 11px; font-weight: 600; margin-top: 4px; }
   .jersey-select { width: 100%; min-width: 120px; font-size: 13px !important; padding: 7px 8px !important; border-radius: 8px !important; }
@@ -597,8 +608,35 @@
   .drawer-item.active { color: #fff; background: rgba(204,0,0,0.18); border-left: 3px solid var(--accent); }
   /* Hamburger: hide on desktop */
   #hamburger-btn { display: none; }
+  /* Quick-nav icon strip (always visible) */
+  #quick-nav {
+    background: #151515;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: center;
+    padding: 0 4px;
+    position: sticky;
+    top: 64px;
+    z-index: 99;
+  }
+  #quick-nav button {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    background: none; border: none; cursor: pointer;
+    color: rgba(255,255,255,0.35);
+    padding: 8px 14px 7px;
+    font-size: 9px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase;
+    line-height: 1; border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+  }
+  #quick-nav button svg { display: block; }
+  #quick-nav button:hover { color: rgba(255,255,255,0.7); }
+  #quick-nav button.active { color: #fff; border-bottom-color: var(--accent); }
   @media (max-width: 640px) {
     #hamburger-btn { display: block; }
+    #quick-nav { top: 52px; padding: 0; }
+    #quick-nav button { padding: 7px 8px 6px; font-size: 8px; flex: 1; }
   }
   /* Theme toggle */
   .theme-toggle {
@@ -649,6 +687,34 @@
   </nav>
   <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">☀ Hell</button>
 </header>
+
+<!-- Quick-Nav Icon Strip -->
+<div id="quick-nav">
+  <button id="qnav-home" onclick="showPage('home')">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+    <span>Start</span>
+  </button>
+  <button id="qnav-sets" onclick="showPage('sets')">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/></svg>
+    <span>Trikots</span>
+  </button>
+  <button id="qnav-players" onclick="showPage('players')">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <span>Spieler</span>
+  </button>
+  <button id="qnav-vorlagen" onclick="showPage('vorlagen')">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    <span>Vorlagen</span>
+  </button>
+  <button id="qnav-lineup" onclick="showPage('lineup')">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+    <span>Aufstellung</span>
+  </button>
+  <button id="qnav-guide" onclick="showPage('guide')">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    <span>Anleitung</span>
+  </button>
+</div>
 
 <!-- Drawer overlay -->
 <div id="drawer-overlay" onclick="closeDrawer()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;"></div>
@@ -1251,6 +1317,10 @@ function showPage(name) {
   document.querySelectorAll('.drawer-item').forEach(b => b.classList.remove('active'));
   const drawerBtn = document.getElementById('drawer-' + name);
   if (drawerBtn) drawerBtn.classList.add('active');
+  // quick-nav
+  document.querySelectorAll('#quick-nav button').forEach(b => b.classList.remove('active'));
+  const qnavBtn = document.getElementById('qnav-' + name);
+  if (qnavBtn) qnavBtn.classList.add('active');
   // scroll to top
   window.scrollTo(0, 0);
   if (name === 'home') renderHome();
@@ -1967,33 +2037,37 @@ function renderManualResult() {
     const qLabel = q==='reserved' ? '🔒 Reserviert' : q==='perfect' ? '✓ Perfekt' : q==='num-only' ? '≈ Wunschnummer' : q==='size-only' ? '≈ Passende Größe' : '';
     const qColor = q==='perfect'||q==='reserved' ? 'var(--success)' : 'var(--warning)';
     return `<div class="match-row ${rowClass}">
-      <div class="match-jersey ${jClass}">
-        <div class="n">${r.jersey.number}</div>
-        <div class="s">${r.jersey.size}</div>
-      </div>
-      <div class="match-player-info">
+      <div class="match-row-top">
         <div class="match-player-name">${esc(r.player.name)}</div>
-        <div class="match-player-meta">Gr. ${r.player.size}${r.player.preferredNumber ? ' · Wunsch #'+r.player.preferredNumber : ''}</div>
-        ${qLabel ? `<div class="match-quality-badge" style="color:${qColor};">${qLabel}</div>` : ''}
+        ${qLabel ? `<div class="match-quality-badge" style="color:${qColor};white-space:nowrap;">${qLabel}</div>` : ''}
       </div>
-      ${jerseySelect(r.jersey.id, r.player.id)}
+      <div class="match-row-bottom">
+        <div class="match-jersey ${jClass}">
+          <div class="n">${r.jersey.number}</div>
+          <div class="s">${r.jersey.size}</div>
+        </div>
+        <div class="match-player-meta" style="flex:1;">Gr. ${r.player.size}${r.player.preferredNumber ? ' · Wunsch #'+r.player.preferredNumber : ''}</div>
+        ${jerseySelect(r.jersey.id, r.player.id)}
+      </div>
     </div>`;
   }).join('');
 
   if (sortedUnmatched.length) {
     html += `<div class="section-divider" style="color:var(--danger);">Kein passendes Trikot</div>`;
     html += sortedUnmatched.map(p => `
-      <div class="match-row" style="border-color:#f7c1c1;">
-        <div class="match-jersey none-jersey">
-          <div class="n">—</div>
-          <div class="s">${p.size}</div>
-        </div>
-        <div class="match-player-info">
+      <div class="match-row" style="border-color:rgba(153,0,0,0.25);">
+        <div class="match-row-top">
           <div class="match-player-name">${esc(p.name)}</div>
-          <div class="match-player-meta">Gr. ${p.size}${p.preferredNumber ? ' · Wunsch #'+p.preferredNumber : ''}</div>
-          <div class="match-quality-badge" style="color:var(--danger);">✗ Kein Trikot</div>
+          <div class="match-quality-badge" style="color:var(--danger);white-space:nowrap;">✗ Kein Trikot</div>
         </div>
-        ${jerseySelect(null, p.id)}
+        <div class="match-row-bottom">
+          <div class="match-jersey none-jersey">
+            <div class="n">—</div>
+            <div class="s">${p.size}</div>
+          </div>
+          <div class="match-player-meta" style="flex:1;">Gr. ${p.size}${p.preferredNumber ? ' · Wunsch #'+p.preferredNumber : ''}</div>
+          ${jerseySelect(null, p.id)}
+        </div>
       </div>
     `).join('');
   }
