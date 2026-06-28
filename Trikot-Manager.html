@@ -709,73 +709,99 @@
     <button class="btn btn-primary" onclick="downloadGuidePDF()">⬇ PDF herunterladen</button>
   </div>
 
-  <div id="guide-content">
+  <div id="guide-content"></div>
 
-    <div class="card">
-      <h3 style="color:var(--primary);margin-top:0;">Willkommen beim Trikot-Manager</h3>
-      <p style="font-size:14px;line-height:1.7;">Der Trikot-Manager der <strong>SG Bliesen-Winterbach</strong> hilft dir, Trikotsätze zu verwalten, Spieler zuzuordnen und vor jedem Spiel eine Aufstellung mit automatischer Trikotzuweisung zu erstellen. Die App läuft direkt im Browser und speichert alle Daten lokal auf deinem Gerät.</p>
-    </div>
+  <script>
+  (function buildGuide() {
+    const sections = [
+      {
+        title: '👋 Willkommen',
+        open: true,
+        html: `<p>Der Trikot-Manager der <strong>SG Bliesen-Winterbach</strong> hilft dir, Trikotsätze zu verwalten, Spieler zuzuordnen und vor jedem Spiel eine Aufstellung mit automatischer Trikotzuweisung zu erstellen. Die App läuft direkt im Browser und speichert alle Daten lokal auf deinem Gerät.</p>`
+      },
+      {
+        title: '👕 1. Trikotsätze',
+        html: `<p><strong>Trikotsätze anlegen:</strong> Über „+ Neuer Satz" einen Satz anlegen, z.B. „Heimtrikot 2024". Danach über „+ Trikot" einzelne Trikots mit Nummer und Größe hinzufügen.</p>
+               <p><strong>Trikots hinzufügen:</strong> Jedes Trikot hat eine Nummer (z.B. 9) und eine Größe (XS – 3XL). Mehrere Trikots können nacheinander im selben Dialog hinzugefügt werden.</p>
+               <p><strong>Trikot reservieren:</strong> Über das 🔒-Symbol kann ein Trikot fest einem Spieler zugewiesen werden – es wird beim Matching immer zuerst für diesen Spieler reserviert.</p>
+               <p><strong>Einklappen:</strong> Karten per Klick auf den Header ein-/ausklappen (▼ / ▶).</p>
+               <p><strong>Bearbeiten / Löschen:</strong> Name über „Bearbeiten" ändern, Trikots über × entfernen, ganzen Satz über „Löschen" entfernen.</p>`
+      },
+      {
+        title: '👥 2. Spieler',
+        html: `<p><strong>Spieler anlegen:</strong> Über „+ Neu" Name, Größe und optional eine Wunsch-Trikotnummer eintragen. Die Wunschnummer wird beim Matching bevorzugt.</p>
+               <p><strong>Foto:</strong> Im Bearbeiten-Dialog kann ein Foto aus der Galerie oder Kamera hinzugefügt werden.</p>
+               <p><strong>Aktiv / Inaktiv:</strong> Spieler können über den <span style="display:inline-flex;align-items:center;gap:4px;vertical-align:middle;"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#3b6d11;color:#fff;font-size:10px;font-weight:700;">A</span> / <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#cc0000;color:#fff;font-size:10px;font-weight:700;">I</span></span>-Button als inaktiv markiert werden (z.B. bei Verletzung). In der Aufstellung sind inaktive Spieler standardmäßig ausgeblendet.</p>
+               <p><strong>Export / Import:</strong> Über ⬇ Export und ⬆ Import lassen sich Spieler als JSON (vollständig) oder CSV (nur Spieler, für Excel) sichern und wiederherstellen.</p>`
+      },
+      {
+        title: '📋 3. Vorlagen',
+        html: `<p><strong>Vorlage anlegen:</strong> Über „+ Neue Vorlage" eine Standardaufstellung erstellen, z.B. „1. Mannschaft". Spieler per Checkbox auswählen – das Suchfeld hilft bei großen Kadern.</p>
+               <p><strong>Vorlage verwenden:</strong> In der Aufstellung (Schritt 2) eine Vorlage aus dem Dropdown laden – die Spielerauswahl wird automatisch vorbelegt.</p>
+               <p><strong>Einklappen:</strong> Vorlagen-Karten per Klick auf den Header ein-/ausklappen. Die Spieler werden dann einzeln untereinander angezeigt.</p>`
+      },
+      {
+        title: '⚽ 4. Aufstellung & Trikot-Matching',
+        html: `<p><strong>Spielinfo (optional):</strong> Mannschaft, Gegner und Datum eintragen – erscheinen auf dem Export.</p>
+               <p><strong>Schritt 1 – Trikotsatz wählen:</strong> Gewünschten Satz auswählen, verfügbare Trikots werden als Vorschau angezeigt.</p>
+               <p><strong>Schritt 2 – Spieler auswählen:</strong> Spieler per Klick auswählen oder Vorlage laden. Filter und Suchfeld helfen bei großen Kadern.</p>
+               <p><strong>Schritt 3 – Trikot-Matching:</strong> Die App vergibt automatisch Trikots in dieser Reihenfolge:</p>
+               <ol style="padding-left:20px;line-height:1.9;">
+                 <li>🔒 Reservierte Trikots → immer zuerst</li>
+                 <li>Wunschnummer <strong>und</strong> passende Größe (perfekt)</li>
+                 <li>Wunschnummer, andere Größe</li>
+                 <li>Passende Größe, beliebige Nummer</li>
+                 <li>Kein passendes Trikot gefunden</li>
+               </ol>
+               <p><strong>Manuelle Anpassung:</strong> Jede Zuweisung per Dropdown ändern. Freie Trikots stehen oben (✓ grün), vergebene unten (✗ rot). Tausch erfolgt automatisch.</p>`
+      },
+      {
+        title: '📤 5. Export',
+        html: `<p><strong>Bild (PNG):</strong> Aufstellung als Bild speichern – zuerst Vorschau, dann Download. Ideal für WhatsApp & Messenger.</p>
+               <p><strong>PDF:</strong> Aufstellung als PDF herunterladen – gut für den Ausdruck oder das Archiv.</p>
+               <p><strong>Anleitung als PDF:</strong> Diese Anleitung kann über den Button oben rechts als PDF heruntergeladen werden.</p>
+               <p>Alle Exporte enthalten Mannschaft, Datum, Gegner, Spieler mit Trikotnummer und nicht zugeordnete Spieler.</p>`
+      },
+      {
+        title: '💾 6. Daten sichern & übertragen',
+        html: `<p>Alle Daten werden <strong>lokal auf dem Gerät</strong> gespeichert. Um Daten zu sichern oder auf ein anderes Gerät zu übertragen:</p>
+               <p><strong>JSON Export:</strong> Kompletten Datenstand (Trikotsätze, Spieler, Vorlagen, Aufstellungshistorie) als JSON-Datei exportieren.</p>
+               <p><strong>JSON Import:</strong> Gesicherte Datei importieren. <em>Achtung: Bestehende Daten werden überschrieben.</em></p>
+               <p><strong>Tipp:</strong> Regelmäßig exportieren und per E-Mail oder Cloud an alle Trainer verteilen.</p>`
+      },
+      {
+        title: '🔗 App-URL & Installation',
+        html: `<p>Die App ist unter folgender Adresse erreichbar:</p>
+               <div style="background:var(--surface-alt);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin:8px 0;">
+                 <code style="font-size:13px;word-break:break-all;color:var(--text);">https://haehnje.github.io/sg-trikot-manager-/Trikot-Manager.html</code>
+               </div>
+               <p>Auf dem Handy: Im Browser öffnen → Menü → „Zum Startbildschirm hinzufügen" — die App verhält sich dann wie eine native App.</p>`
+      }
+    ];
 
-    <div class="card">
-      <h3 style="margin-top:0;">1. Trikotsätze</h3>
-      <p style="font-size:14px;line-height:1.7;"><strong>Trikotsätze anlegen:</strong> Über „+ Neuer Satz" einen Satz anlegen, z.B. „Heimtrikot 2024". Danach über „+ Trikot" einzelne Trikots mit Nummer und Größe hinzufügen.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>Trikots hinzufügen:</strong> Jedes Trikot hat eine Nummer (z.B. 9) und eine Größe (XS – 3XL). Mehrere Trikots können nacheinander im selben Dialog hinzugefügt werden.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>Einklappen:</strong> Karten können durch Klick auf den Header ein- und ausgeklappt werden (▼ / ▶), um den Überblick zu behalten.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>Bearbeiten / Löschen:</strong> Name eines Satzes über „Bearbeiten" ändern, einzelne Trikots über × entfernen, ganzen Satz über „Löschen" entfernen.</p>
-    </div>
+    const container = document.getElementById('guide-content');
+    container.innerHTML = sections.map((s, i) => `
+      <div class="card" style="overflow:hidden;padding:0;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;user-select:none;" onclick="toggleGuideSection(${i})">
+          <strong style="font-size:15px;">${s.title}</strong>
+          <span id="guide-chevron-${i}" style="font-size:12px;color:var(--text-muted);transition:transform .2s;">${s.open ? '▼' : '▶'}</span>
+        </div>
+        <div id="guide-body-${i}" style="padding:${s.open?'0 18px 16px':'0'};max-height:${s.open?'2000px':'0'};overflow:hidden;transition:max-height .3s ease,padding .2s;">
+          <div style="font-size:14px;line-height:1.75;color:var(--text);">${s.html}</div>
+        </div>
+      </div>
+    `).join('');
+  })();
 
-    <div class="card">
-      <h3 style="margin-top:0;">2. Spieler</h3>
-      <p style="font-size:14px;line-height:1.7;"><strong>Spieler anlegen:</strong> Über „+ Neuer Spieler" Name, Trikotsatgröße und optional eine Wunsch-Trikotnummer eintragen. Die Wunschnummer wird beim Trikot-Matching bevorzugt.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>Aktiv / Inaktiv:</strong> Spieler können über den Button „Inaktiv setzen" / „Aktiv setzen" ein- oder ausgeblendet werden, z.B. für verletzte Spieler. In der Aufstellung sind inaktive Spieler standardmäßig ausgeblendet.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>Vorlagen-Zugehörigkeit:</strong> Auf der Spielerseite wird angezeigt, in welchen Vorlagen ein Spieler eingetragen ist.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>CSV Import / Export:</strong> Spieler können als CSV-Datei exportiert (für Excel) oder aus einer CSV importiert werden. Beim Import werden bestehende Spieler per Name abgeglichen und aktualisiert, neue Spieler werden hinzugefügt. Eine leere Vorlage zum Ausfüllen steht ebenfalls zum Download bereit.</p>
-    </div>
-
-    <div class="card">
-      <h3 style="margin-top:0;">3. Vorlagen (Standardaufstellungen)</h3>
-      <p style="font-size:14px;line-height:1.7;"><strong>Vorlage anlegen:</strong> Über „+ Neue Vorlage" eine Standardaufstellung erstellen, z.B. „1. Mannschaft". Spieler per Checkbox auswählen – das Suchfeld hilft bei großen Kader schnell den richtigen Spieler zu finden.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>Vorlage verwenden:</strong> In der Aufstellung (Schritt 2) kann eine gespeicherte Vorlage geladen werden, um die Spielerauswahl automatisch vorzubelegen.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>Einklappen:</strong> Wie bei den Trikotsätzen können Vorlagen-Karten durch Klick auf den Header ein- und ausgeklappt werden.</p>
-    </div>
-
-    <div class="card">
-      <h3 style="margin-top:0;">4. Aufstellung & Trikot-Matching</h3>
-      <p style="font-size:14px;line-height:1.7;"><strong>Spielinfo (optional):</strong> Spieldatum und Gegner eintragen – diese Angaben erscheinen auf dem exportierten Dokument.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>Schritt 1 – Trikotsatz wählen:</strong> Den gewünschten Satz aus der Liste auswählen. Die verfügbaren Trikots werden als Vorschau angezeigt.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>Schritt 2 – Spieler auswählen:</strong> Spieler per Klick auswählen. Über den Filter lassen sich nur aktive Spieler anzeigen. Das Suchfeld ermöglicht schnelles Auffinden einzelner Spieler. Alternativ eine gespeicherte Vorlage laden, die die Auswahl automatisch befüllt.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>Schritt 3 – Trikot-Matching:</strong> Nach Klick auf „Trikots zuordnen" vergibt die App automatisch Trikots nach folgendem Algorithmus:</p>
-      <ol style="font-size:14px;line-height:1.9;padding-left:20px;">
-        <li>Wunschnummer <strong>und</strong> passende Größe → perfekte Übereinstimmung</li>
-        <li>Wunschnummer, aber andere Größe</li>
-        <li>Passende Größe, beliebige Nummer</li>
-        <li>Kein passendes Trikot gefunden</li>
-      </ol>
-      <p style="font-size:14px;line-height:1.7;"><strong>Manuelle Anpassung:</strong> Nach dem Matching kann jede Trikot-Zuweisung manuell geändert werden. Im Dropdown sind freie Trikots grün (✓) oben, vergebene Trikots rot (✗) unten aufgelistet. Bei Auswahl eines vergebenen Trikots erfolgt automatisch ein Tausch.</p>
-    </div>
-
-    <div class="card">
-      <h3 style="margin-top:0;">5. Export</h3>
-      <p style="font-size:14px;line-height:1.7;"><strong>Bild (PNG):</strong> Die Aufstellung mit Trikotzuweisung als PNG-Datei herunterladen – ideal zum Teilen per WhatsApp oder anderen Messengern.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>PDF:</strong> Die Aufstellung als PDF herunterladen – gut für den Ausdruck oder das Archiv.</p>
-      <p style="font-size:14px;line-height:1.7;">Beide Exporte enthalten Datum, Gegner, alle zugeordneten Spieler mit Trikotnummer sowie nicht zugeordnete Spieler.</p>
-    </div>
-
-    <div class="card">
-      <h3 style="margin-top:0;">6. Daten sichern & übertragen</h3>
-      <p style="font-size:14px;line-height:1.7;">Alle Daten werden <strong>lokal auf dem Gerät</strong> gespeichert und sind nicht automatisch mit anderen Geräten synchronisiert. Um Daten zu sichern oder auf ein anderes Gerät zu übertragen:</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>JSON Export:</strong> Kompletten Datenstand (Trikotsätze, Spieler, Vorlagen) als JSON-Datei exportieren.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>JSON Import:</strong> Gesicherte JSON-Datei auf einem anderen Gerät importieren. Achtung: Bestehende Daten werden dabei überschrieben.</p>
-      <p style="font-size:14px;line-height:1.7;"><strong>Tipp:</strong> Regelmäßig einen JSON-Export erstellen und sicher ablegen, z.B. in der Cloud oder per E-Mail an alle Trainer senden.</p>
-    </div>
-
-    <div class="card" style="border-color:var(--primary);background:rgba(204,0,0,0.04);">
-      <h3 style="margin-top:0;">App-URL</h3>
-      <p style="font-size:14px;line-height:1.7;">Die App ist unter folgender Adresse erreichbar und kann auf dem Startbildschirm des Handys installiert werden:</p>
-      <p style="font-size:14px;font-family:monospace;background:var(--surface-2,#1e1e1e);padding:10px 14px;border-radius:8px;word-break:break-all;">https://haehnje.github.io/sg-trikot-manager-/Trikot-Manager.html</p>
-    </div>
-
-  </div><!-- /#guide-content -->
+  function toggleGuideSection(i) {
+    const body    = document.getElementById('guide-body-' + i);
+    const chevron = document.getElementById('guide-chevron-' + i);
+    const isOpen  = body.style.maxHeight !== '0px' && body.style.maxHeight !== '0';
+    body.style.maxHeight  = isOpen ? '0' : '2000px';
+    body.style.padding    = isOpen ? '0 18px' : '0 18px 16px';
+    chevron.textContent   = isOpen ? '▶' : '▼';
+  }
+  </script>
 </div>
 
 </main>
@@ -1858,7 +1884,10 @@ function renderVorlagen() {
     const names = l.playerIds.map(id => db.players.find(p => p.id === id)?.name).filter(Boolean);
     const collapsed = collapsedVorlagen.has(l.id);
     const chevron = collapsed ? '▶' : '▼';
-    const body = collapsed ? '' : `<div class="collapsible-body" style="font-size:13px;color:var(--text-muted);">${names.length ? names.join(', ') : 'Keine Spieler zugeordnet.'}</div>`;
+    const playerRows = names.length
+      ? names.map(n => `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--border);"><span style="font-size:13px;">👤</span><span style="font-size:13px;">${esc(n)}</span></div>`).join('') + `<div style="font-size:11px;color:var(--text-muted);margin-top:6px;">${names.length} Spieler</div>`
+      : '<p style="font-size:13px;color:var(--text-muted);">Keine Spieler zugeordnet.</p>';
+    const body = collapsed ? '' : `<div class="collapsible-body">${playerRows}</div>`;
     return `<div class="card" style="overflow:hidden;">
       <div class="card-header" style="cursor:pointer;" onclick="toggleVorlageCollapse('${l.id}')">
         <div style="display:flex;align-items:center;gap:8px;">
