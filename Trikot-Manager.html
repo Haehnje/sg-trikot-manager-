@@ -447,6 +447,50 @@
   }
   .size-tag.chosen { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-text); font-weight: 500; }
   .filter-row { display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+  /* ===== HOME TILES ===== */
+  .home-tile {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px; padding: 24px 12px;
+    background: var(--surface); border: 0.5px solid var(--border);
+    border-radius: 16px; cursor: pointer;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .home-tile:hover { background: var(--surface-alt); box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  .home-tile:active { transform: scale(0.97); }
+  .home-tile-icon { font-size: 36px; line-height: 1; }
+  .home-tile-label { font-size: 15px; font-weight: 600; color: var(--text); }
+  .home-tile-sub { font-size: 12px; color: var(--text-muted); }
+  /* ===== MATCH RESULT LAYOUT ===== */
+  .match-section-header { margin-bottom: 0.75rem; }
+  .match-section-header h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .match-action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .match-row {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 0.5px solid var(--border);
+    margin-bottom: 8px;
+    background: var(--surface-alt);
+    align-items: center;
+  }
+  .match-jersey {
+    width: 52px; height: 52px;
+    border-radius: 10px;
+    background: var(--accent-bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .match-jersey .n { font-size: 20px; font-weight: 700; color: var(--accent-text); }
+  .match-jersey .s { font-size: 11px; color: var(--accent-text); opacity: 0.75; }
+  .match-player-info { min-width: 0; }
+  .match-player-name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .match-player-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .match-quality-badge { font-size: 11px; font-weight: 500; margin-top: 3px; }
+  .jersey-select { width: 100%; min-width: 110px; font-size: 13px !important; padding: 6px 8px !important; }
   .match-result-star { color: #eaad2b; font-size: 16px; }
   /* Dark mode */
   [data-theme="dark"] {
@@ -538,7 +582,8 @@
     <div class="club-sub">Trikot-Manager</div>
   </div>
   <nav>
-    <button class="active" onclick="showPage('sets')">Trikotsätze</button>
+    <button onclick="showPage('home')">Start</button>
+    <button onclick="showPage('sets')">Trikotsätze</button>
     <button onclick="showPage('players')">Spieler</button>
     <button onclick="showPage('vorlagen')">Vorlagen</button>
     <button onclick="showPage('lineup')">Aufstellung</button>
@@ -559,6 +604,9 @@
   </div>
   <!-- Nav Items -->
   <div style="padding:12px 0;">
+    <button class="drawer-item" id="drawer-home" onclick="showPage('home');closeDrawer()">
+      <span style="font-size:20px;">🏠</span> Startmenü
+    </button>
     <button class="drawer-item" id="drawer-sets" onclick="showPage('sets');closeDrawer()">
       <span style="font-size:20px;">👕</span> Trikotsätze
     </button>
@@ -584,8 +632,45 @@
 
 <main>
 
+<!-- === STARTMENÜ === -->
+<div id="page-home" class="page active">
+  <div style="text-align:center;padding:1.5rem 0 1rem;">
+    <div style="font-size:13px;color:var(--text-muted);background:var(--surface);border:0.5px solid var(--border);border-radius:10px;padding:10px 16px;display:inline-flex;align-items:center;gap:8px;max-width:420px;text-align:left;">
+      <span style="font-size:18px;">☰</span>
+      <span>Über das <strong>Hamburgermenü</strong> oben links kannst du jederzeit zwischen allen Bereichen wechseln.</span>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:8px;" id="home-grid">
+    <button class="home-tile" onclick="showPage('sets')">
+      <span class="home-tile-icon">👕</span>
+      <span class="home-tile-label">Trikotsätze</span>
+      <span class="home-tile-sub">Trikots verwalten</span>
+    </button>
+    <button class="home-tile" onclick="showPage('players')">
+      <span class="home-tile-icon">👥</span>
+      <span class="home-tile-label">Spieler</span>
+      <span class="home-tile-sub">Kader pflegen</span>
+    </button>
+    <button class="home-tile" onclick="showPage('vorlagen')">
+      <span class="home-tile-icon">📋</span>
+      <span class="home-tile-label">Vorlagen</span>
+      <span class="home-tile-sub">Standardaufstellungen</span>
+    </button>
+    <button class="home-tile" onclick="showPage('lineup')">
+      <span class="home-tile-icon">⚽</span>
+      <span class="home-tile-label">Aufstellung</span>
+      <span class="home-tile-sub">Trikot-Matching</span>
+    </button>
+    <button class="home-tile" onclick="showPage('guide')" style="grid-column:span 2;">
+      <span class="home-tile-icon">ℹ️</span>
+      <span class="home-tile-label">Anleitung</span>
+      <span class="home-tile-sub">Hilfe & App-URL</span>
+    </button>
+  </div>
+</div>
+
 <!-- === TRIKOTSÄTZE === -->
-<div id="page-sets" class="page active">
+<div id="page-sets" class="page">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
     <h2 style="margin:0">Trikotsätze</h2>
     <button class="btn btn-primary" onclick="openNewSetModal()">+ Neuer Satz</button>
@@ -610,6 +695,14 @@
       <button class="btn" onclick="openModal('modal-import')">⬆ Import</button>
       <button class="btn btn-primary" onclick="openAddPlayerModal()">+ Neu</button>
     </div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;">
+    <input type="text" id="players-search" placeholder="🔍 Spieler suchen…" oninput="renderPlayers()" style="flex:1;min-width:140px;margin-bottom:0;">
+    <select id="players-filter" onchange="renderPlayers()" style="width:140px;">
+      <option value="alle">Alle Spieler</option>
+      <option value="aktiv">Nur Aktive</option>
+      <option value="inaktiv">Nur Inaktive</option>
+    </select>
   </div>
   <div id="players-list"></div>
 </div>
@@ -672,12 +765,12 @@
   </div>
   <div id="match-result-card" style="display:none;">
     <div class="card">
-      <div class="result-header">
-        <h3 style="margin:0">3. Trikot-Matching</h3>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-sm" onclick="exportSheet('image')">🖼 Bild</button>
-          <button class="btn btn-sm" onclick="exportSheet('pdf')">📄 PDF</button>
-          <button class="btn btn-primary btn-sm" onclick="runMatch()">Neu berechnen</button>
+      <div class="match-section-header">
+        <h3>3. Trikot-Matching</h3>
+        <div class="match-action-row">
+          <button class="btn btn-sm" onclick="exportSheet('image')">🖼 Bild exportieren</button>
+          <button class="btn btn-sm" onclick="exportSheet('pdf')">📄 PDF exportieren</button>
+          <button class="btn btn-primary btn-sm" onclick="runMatch()">↺ Neu berechnen</button>
         </div>
       </div>
       <div class="stats-row" id="match-stats"></div>
@@ -1090,7 +1183,7 @@ function showPage(name) {
   document.getElementById('page-' + name).classList.add('active');
   // top nav
   const btns = document.querySelectorAll('nav:not(#bottom-nav) button');
-  const idx = {sets:0, players:1, vorlagen:2, lineup:3, guide:4}[name];
+  const idx = {home:0, sets:1, players:2, vorlagen:3, lineup:4, guide:5}[name];
   if (idx !== undefined && btns[idx]) btns[idx].classList.add('active');
   // bottom nav
   document.querySelectorAll('#bottom-nav button').forEach(b => b.classList.remove('active'));
@@ -1102,6 +1195,7 @@ function showPage(name) {
   if (drawerBtn) drawerBtn.classList.add('active');
   // scroll to top
   window.scrollTo(0, 0);
+  if (name === 'home') renderHome();
   if (name === 'sets') renderSets();
   if (name === 'players') renderPlayers();
   if (name === 'vorlagen') renderVorlagen();
@@ -1436,13 +1530,37 @@ function deleteJersey(setId, jerseyId) {
 }
 
 // ---- PLAYERS ----
+function renderHome() {
+  // update tile subtexts with live counts
+  const setsCount = db.sets.length;
+  const playersCount = db.players.filter(p => p.active !== false).length;
+  const vorlCount = db.lineups.length;
+  const subtexts = [`${setsCount} Satz/Sätze`, `${playersCount} aktive Spieler`, `${vorlCount} Vorlage(n)`, 'Trikot-Matching', 'Hilfe & App-URL'];
+  document.querySelectorAll('.home-tile-sub').forEach((el, i) => {
+    if (subtexts[i]) el.textContent = subtexts[i];
+  });
+}
+
 function renderPlayers() {
   const el = document.getElementById('players-list');
   if (!db.players.length) {
     el.innerHTML = '<div class="empty-state">Noch keine Spieler. Füge deine Mannschaft hinzu.</div>';
     return;
   }
-  const sorted = [...db.players].sort((a,b) => a.name.localeCompare(b.name, 'de'));
+  const q = (document.getElementById('players-search')?.value || '').toLowerCase().trim();
+  const filter = document.getElementById('players-filter')?.value || 'alle';
+  let sorted = [...db.players].sort((a,b) => a.name.localeCompare(b.name, 'de'));
+  sorted = sorted.filter(p => {
+    const isActive = p.active !== false;
+    if (filter === 'aktiv' && !isActive) return false;
+    if (filter === 'inaktiv' && isActive) return false;
+    if (q && !p.name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if (!sorted.length) {
+    el.innerHTML = '<div class="card"><div class="empty-state">Keine Spieler gefunden.</div></div>';
+    return;
+  }
   el.innerHTML = `<div class="card"><div>${
     sorted.map(p => {
       const isActive = p.active !== false;
@@ -1778,7 +1896,7 @@ function renderManualResult() {
         return `<option value="${j.id}" ${isSelf?'selected':''} style="background:${isSelf?'':'#f8d7da'};color:${isSelf?'':'#721c24'};">✗ #${j.number} ${j.size}${!isSelf?' ('+takenMap[j.id]+')':''}</option>`;
       })
     ].join('');
-    return `<select onchange="changeJersey('${playerId}',this.value)" style="font-size:12px;padding:3px 5px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);max-width:170px;">${opts}</select>`;
+    return `<select class="jersey-select" onchange="changeJersey('${playerId}',this.value)">${opts}</select>`;
   }
 
   const sortedResults = [...manualResults].sort((a,b) => a.player.name.localeCompare(b.player.name,'de'));
@@ -1788,15 +1906,17 @@ function renderManualResult() {
     const q = r.quality;
     const jClass = (q==='perfect'||q==='reserved') ? '' : 'warning-jersey';
     const rowClass = q==='perfect' ? 'q-perfect' : q==='reserved' ? 'q-perfect' : q==='manual' ? 'q-manual' : 'q-partial';
-    const qLabel = q==='reserved' ? '🔒' : q==='perfect' ? '✓' : q==='num-only' ? '≈ Nr.' : q==='size-only' ? '≈ Gr.' : '';
+    const qLabel = q==='reserved' ? '🔒 Reserviert' : q==='perfect' ? '✓ Perfekt' : q==='num-only' ? '≈ Wunschnummer' : q==='size-only' ? '≈ Passende Größe' : '';
+    const qColor = q==='perfect'||q==='reserved' ? 'var(--success)' : 'var(--warning)';
     return `<div class="match-row ${rowClass}">
       <div class="match-jersey ${jClass}">
         <div class="n">${r.jersey.number}</div>
         <div class="s">${r.jersey.size}</div>
       </div>
-      <div style="flex:1;">
-        <div style="font-weight:500;font-size:14px;">${esc(r.player.name)} ${qLabel?`<span style="font-size:11px;opacity:.65;">${qLabel}</span>`:''}</div>
-        <div style="font-size:12px;color:var(--text-muted);">Größe ${r.player.size}${r.player.preferredNumber?' · Wunsch #'+r.player.preferredNumber:''}</div>
+      <div class="match-player-info">
+        <div class="match-player-name">${esc(r.player.name)}</div>
+        <div class="match-player-meta">Gr. ${r.player.size}${r.player.preferredNumber ? ' · Wunsch #'+r.player.preferredNumber : ''}</div>
+        ${qLabel ? `<div class="match-quality-badge" style="color:${qColor};">${qLabel}</div>` : ''}
       </div>
       ${jerseySelect(r.jersey.id, r.player.id)}
     </div>`;
@@ -1805,14 +1925,15 @@ function renderManualResult() {
   if (sortedUnmatched.length) {
     html += `<div class="section-divider" style="color:var(--danger);">Kein passendes Trikot</div>`;
     html += sortedUnmatched.map(p => `
-      <div class="match-row" style="border-color:var(--border-danger,#f7c1c1);">
+      <div class="match-row" style="border-color:#f7c1c1;">
         <div class="match-jersey none-jersey">
           <div class="n">—</div>
           <div class="s">${p.size}</div>
         </div>
-        <div style="flex:1;">
-          <div style="font-weight:500;font-size:14px;">${esc(p.name)}</div>
-          <div style="font-size:12px;color:var(--text-muted);">Größe ${p.size}${p.preferredNumber?' · Wunsch #'+p.preferredNumber:''}</div>
+        <div class="match-player-info">
+          <div class="match-player-name">${esc(p.name)}</div>
+          <div class="match-player-meta">Gr. ${p.size}${p.preferredNumber ? ' · Wunsch #'+p.preferredNumber : ''}</div>
+          <div class="match-quality-badge" style="color:var(--danger);">✗ Kein Trikot</div>
         </div>
         ${jerseySelect(null, p.id)}
       </div>
@@ -2167,6 +2288,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
 });
 
+renderHome();
 renderSets();
 
 // Demo-Daten beim ersten Start
@@ -2193,6 +2315,10 @@ if (!db.sets.length && !db.players.length) {
 
 <!-- Bottom Navigation (mobile only) -->
 <nav id="bottom-nav">
+  <button onclick="showPage('home')" id="bnav-home">
+    <span class="nav-icon">🏠</span>
+    <span>Start</span>
+  </button>
   <button onclick="showPage('sets')" id="bnav-sets">
     <span class="nav-icon">👕</span>
     <span>Trikots</span>
@@ -2208,10 +2334,6 @@ if (!db.sets.length && !db.players.length) {
   <button onclick="showPage('lineup')" id="bnav-lineup">
     <span class="nav-icon">⚽</span>
     <span>Spiel</span>
-  </button>
-  <button onclick="showPage('guide')" id="bnav-guide">
-    <span class="nav-icon">ℹ️</span>
-    <span>Info</span>
   </button>
 </nav>
 
