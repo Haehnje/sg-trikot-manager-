@@ -269,39 +269,45 @@
   .player-row {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 0;
+    gap: 12px;
+    padding: 12px 0;
     border-bottom: 0.5px solid var(--border);
+    transition: background 0.1s;
   }
   .player-row:last-child { border-bottom: none; }
   .player-avatar {
-    width: 36px; height: 36px;
+    width: 44px; height: 44px;
     border-radius: 50%;
     background: var(--accent-bg);
     color: var(--accent-text);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 14px;
+    font-weight: 600;
     flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   }
-  .player-info { flex: 1; }
-  .player-name { font-weight: 500; font-size: 14px; }
-  .player-meta { font-size: 12px; color: var(--text-muted); }
+  .player-photo { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+  .player-info { flex: 1; min-width: 0; }
+  .player-name { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .player-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
   .match-row {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 12px;
-    border-radius: var(--radius);
+    padding: 12px 14px;
+    border-radius: 12px;
     border: 0.5px solid var(--border);
-    margin-bottom: 6px;
-    background: var(--surface-alt);
+    margin-bottom: 8px;
+    background: var(--surface);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    transition: box-shadow 0.15s;
   }
+  .match-row:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.09); }
   .match-jersey {
-    width: 44px; height: 44px;
-    border-radius: var(--radius);
+    width: 52px; height: 52px;
+    border-radius: 12px;
     background: var(--accent-bg);
     display: flex;
     flex-direction: column;
@@ -309,12 +315,12 @@
     justify-content: center;
     flex-shrink: 0;
   }
-  .match-jersey .n { font-size: 18px; font-weight: 500; color: var(--accent-text); }
-  .match-jersey .s { font-size: 10px; color: var(--accent-text); opacity: 0.7; }
+  .match-jersey .n { font-size: 20px; font-weight: 700; color: var(--accent-text); line-height: 1; }
+  .match-jersey .s { font-size: 11px; color: var(--accent-text); opacity: 0.75; margin-top: 1px; }
   .match-jersey.warning-jersey { background: var(--warning-bg); }
-  .match-jersey.warning-jersey .n, .match-jersey.warning-jersey .s { color: var(--warning); }
+  .match-jersey.warning-jersey .n, .match-jersey.warning-jersey .s { color: var(--warning); opacity: 1; }
   .match-jersey.none-jersey { background: var(--danger-bg); }
-  .match-jersey.none-jersey .n, .match-jersey.none-jersey .s { color: var(--danger); }
+  .match-jersey.none-jersey .n, .match-jersey.none-jersey .s { color: var(--danger); opacity: 1; }
   .inline-form {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr auto;
@@ -379,16 +385,52 @@
     margin-bottom: 1.5rem;
   }
   .stat-card {
-    background: var(--surface-alt);
-    border-radius: var(--radius);
-    padding: 10px 14px;
+    border-radius: 12px;
+    padding: 14px 10px;
     text-align: center;
+    border: 0.5px solid var(--border);
   }
-  .stat-card .stat-num { font-size: 22px; font-weight: 500; }
-  .stat-card .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .stat-card .stat-icon { font-size: 20px; line-height: 1; margin-bottom: 4px; }
+  .stat-card .stat-num { font-size: 26px; font-weight: 700; line-height: 1.1; }
+  .stat-card .stat-label { font-size: 11px; color: var(--text-muted); margin-top: 3px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-card.green { background: var(--success-bg); border-color: rgba(59,109,17,0.2); }
   .stat-card.green .stat-num { color: var(--success); }
+  .stat-card.amber { background: var(--warning-bg); border-color: rgba(133,79,11,0.2); }
   .stat-card.amber .stat-num { color: var(--warning); }
+  .stat-card.red { background: var(--danger-bg); border-color: rgba(153,0,0,0.2); }
   .stat-card.red .stat-num { color: var(--danger); }
+  /* Empty states */
+  .empty-state-box {
+    text-align: center; padding: 3rem 1.5rem;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .empty-state-icon { font-size: 48px; line-height: 1; opacity: 0.5; }
+  .empty-state-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .empty-state-sub { font-size: 13px; color: var(--text-muted); max-width: 260px; line-height: 1.5; }
+  /* Page fade-in */
+  .page.active { animation: pageFadeIn 0.2s ease; }
+  @keyframes pageFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  /* Player select chips */
+  .player-chip {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    cursor: pointer; border: 1.5px solid var(--border);
+    background: var(--surface); transition: all 0.12s;
+    margin-bottom: 6px;
+  }
+  .player-chip:hover { border-color: var(--accent); background: var(--accent-bg); }
+  .player-chip.selected { border-color: var(--success); background: var(--success-bg); }
+  .player-chip input[type="checkbox"] { display: none; }
+  .player-chip-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 12px; color: transparent;
+    transition: all 0.12s;
+  }
+  .player-chip.selected .player-chip-check { background: var(--success); border-color: var(--success); color: #fff; }
+  /* Jersey chips larger */
+  .jersey-chip { min-width: 62px; padding: 8px 12px; }
   .modal-overlay {
     display: none;
     position: fixed;
@@ -477,20 +519,36 @@
     align-items: center;
   }
   .match-jersey {
-    width: 52px; height: 52px;
-    border-radius: 10px;
+    width: 56px; height: 56px;
+    border-radius: 12px;
     background: var(--accent-bg);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     flex-shrink: 0;
   }
-  .match-jersey .n { font-size: 20px; font-weight: 700; color: var(--accent-text); }
-  .match-jersey .s { font-size: 11px; color: var(--accent-text); opacity: 0.75; }
-  .match-player-info { min-width: 0; }
-  .match-player-name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .match-jersey .n { font-size: 22px; font-weight: 700; color: var(--accent-text); line-height: 1; }
+  .match-jersey .s { font-size: 11px; color: var(--accent-text); opacity: 0.8; margin-top: 1px; }
+  .match-jersey.perfect-jersey { background: var(--success-bg); }
+  .match-jersey.perfect-jersey .n, .match-jersey.perfect-jersey .s { color: var(--success); opacity: 1; }
+  .match-player-info { flex: 1; min-width: 0; }
+  .match-player-name { font-weight: 600; font-size: 14px; word-break: break-word; line-height: 1.3; }
   .match-player-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-  .match-quality-badge { font-size: 11px; font-weight: 500; margin-top: 3px; }
-  .jersey-select { width: 100%; min-width: 110px; font-size: 13px !important; padding: 6px 8px !important; }
+  .match-quality-badge { font-size: 11px; font-weight: 600; margin-top: 4px; }
+  .jersey-select { width: 100%; min-width: 120px; font-size: 13px !important; padding: 7px 8px !important; border-radius: 8px !important; }
+  /* Uniform player action buttons */
+  .player-action-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    border: 0.5px solid var(--border-strong);
+    background: var(--surface);
+    cursor: pointer; font-size: 16px; line-height: 1;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .player-action-btn:hover { background: var(--bg); }
+  .player-action-btn.danger { border-color: var(--danger-bg); }
+  .player-action-btn.danger:hover { background: var(--danger-bg); }
   .match-result-star { color: #eaad2b; font-size: 16px; }
   /* Dark mode */
   [data-theme="dark"] {
@@ -1403,7 +1461,7 @@ function toggleSetCollapse(id) {
 function renderSets() {
   const el = document.getElementById('sets-list');
   if (!db.sets.length) {
-    el.innerHTML = '<div class="empty-state">Noch keine Trikotsätze. Lege deinen ersten Satz an.</div>';
+    el.innerHTML = '<div class="card"><div class="empty-state-box"><div class="empty-state-icon">👕</div><div class="empty-state-title">Noch keine Trikotsätze</div><div class="empty-state-sub">Lege deinen ersten Satz an – z.B. „Heimtrikot 2024".</div></div></div>';
     return;
   }
   el.innerHTML = db.sets.map(s => {
@@ -1544,7 +1602,7 @@ function renderHome() {
 function renderPlayers() {
   const el = document.getElementById('players-list');
   if (!db.players.length) {
-    el.innerHTML = '<div class="empty-state">Noch keine Spieler. Füge deine Mannschaft hinzu.</div>';
+    el.innerHTML = '<div class="card"><div class="empty-state-box"><div class="empty-state-icon">👥</div><div class="empty-state-title">Noch keine Spieler</div><div class="empty-state-sub">Füge deine Mannschaft über „+ Neu" hinzu.</div></div></div>';
     return;
   }
   const q = (document.getElementById('players-search')?.value || '').toLowerCase().trim();
@@ -1558,7 +1616,7 @@ function renderPlayers() {
     return true;
   });
   if (!sorted.length) {
-    el.innerHTML = '<div class="card"><div class="empty-state">Keine Spieler gefunden.</div></div>';
+    el.innerHTML = '<div class="card"><div class="empty-state-box"><div class="empty-state-icon">🔍</div><div class="empty-state-title">Keine Spieler gefunden</div><div class="empty-state-sub">Passe die Suche oder den Filter an.</div></div></div>';
     return;
   }
   el.innerHTML = `<div class="card"><div>${
@@ -1572,18 +1630,14 @@ function renderPlayers() {
         <div class="player-info">
           <div class="player-name">${esc(p.name)} <span class="badge ${isActive ? 'badge-green' : ''}" style="${isActive ? '' : 'background:#eee;color:#999;'}">${isActive ? 'Aktiv' : 'Inaktiv'}</span></div>
           <div class="player-meta">Größe: <strong>${p.size}</strong> · Wunschnummer: <strong>${p.preferredNumber || '—'}</strong></div>
-          ${(()=>{ const vl = db.lineups.filter(l=>l.playerIds.includes(p.id)).map(l=>l.name); return vl.length ? `<div style="font-size:11px;color:var(--text-muted);margin-top:1px;">Vorlagen: ${vl.map(n=>`<span style="background:#f0f0f0;border-radius:4px;padding:0 5px;">${esc(n)}</span>`).join(' ')}</div>` : ''; })()}
+          ${(()=>{ const vl = db.lineups.filter(l=>l.playerIds.includes(p.id)).map(l=>l.name); return vl.length ? `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;"><span>Vorlagen:</span>${vl.map(n=>`<span style="background:var(--surface-alt);border:0.5px solid var(--border);border-radius:6px;padding:1px 7px;color:var(--text-muted);white-space:nowrap;">${esc(n)}</span>`).join('')}</div>` : ''; })()}
         </div>
         <div class="player-actions">
-          <button class="btn btn-sm" onclick="toggleActive('${p.id}')" title="${isActive ? 'Inaktiv setzen' : 'Aktiv setzen'}">
-            <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:${isActive?'#3b6d11':'#cc0000'};color:#fff;font-size:11px;font-weight:700;flex-shrink:0;">${isActive?'A':'I'}</span><span class="player-btn-label"> ${isActive ? 'Inaktiv' : 'Aktiv'}</span>
+          <button class="player-action-btn" onclick="toggleActive('${p.id}')" title="${isActive ? 'Inaktiv setzen' : 'Aktiv setzen'}" style="background:${isActive?'#eaf3de':'#fdecea'};border-color:${isActive?'#3b6d11':'#cc0000'};">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:${isActive?'#3b6d11':'#cc0000'};color:#fff;font-size:11px;font-weight:700;">${isActive?'A':'I'}</span>
           </button>
-          <button class="btn btn-sm" onclick="openEditPlayerModal('${p.id}')" title="Bearbeiten">
-            <span>✏️</span><span class="player-btn-label"> Bearbeiten</span>
-          </button>
-          <button class="btn btn-sm btn-danger" onclick="deletePlayer('${p.id}')" title="Löschen">
-            <span>🗑️</span><span class="player-btn-label"> Löschen</span>
-          </button>
+          <button class="player-action-btn" onclick="openEditPlayerModal('${p.id}')" title="Bearbeiten">✏️</button>
+          <button class="player-action-btn danger" onclick="deletePlayer('${p.id}')" title="Löschen">🗑️</button>
         </div>
       </div>`;
     }).join('')}
@@ -1762,7 +1816,7 @@ function onSetSelected() {
 function renderPlayerSelect() {
   const el = document.getElementById('players-select-list');
   if (!db.players.length) {
-    el.innerHTML = '<div class="empty-state" style="padding:1rem;">Noch keine Spieler angelegt.</div>';
+    el.innerHTML = '<div class="empty-state-box"><div class="empty-state-icon">👥</div><div class="empty-state-title">Noch keine Spieler</div><div class="empty-state-sub">Lege zuerst Spieler im Bereich „Spieler" an.</div></div>';
     return;
   }
   const q = (document.getElementById('player-search')?.value || '').toLowerCase().trim();
@@ -1773,32 +1827,36 @@ function renderPlayerSelect() {
   if (statusFilter === 'inaktiv') filtered = filtered.filter(p => p.active === false);
   if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
   if (!filtered.length) {
-    el.innerHTML = '<div class="empty-state" style="padding:1rem;">Kein Spieler gefunden.</div>';
+    el.innerHTML = '<div class="empty-state-box"><div class="empty-state-icon">🔍</div><div class="empty-state-title">Kein Spieler gefunden</div><div class="empty-state-sub">Suchbegriff oder Filter anpassen.</div></div>';
     return;
   }
   el.innerHTML = filtered.map(p => {
     const isActive = p.active !== false;
+    const sel = selectedPlayers.has(p.id);
     const avatarHtml = p.photo
-      ? `<img class="player-photo" src="${p.photo}" alt="${esc(p.name)}" style="width:30px;height:30px;">`
-      : `<div class="player-avatar" style="width:30px;height:30px;font-size:11px;">${initials(p.name)}</div>`;
-    return `<label class="player-checkbox ${selectedPlayers.has(p.id)?'selected':''}">
-      <input type="checkbox" ${selectedPlayers.has(p.id)?'checked':''} onchange="togglePlayer('${p.id}',this)">
+      ? `<img src="${p.photo}" alt="${esc(p.name)}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+      : `<div class="player-avatar" style="width:38px;height:38px;font-size:13px;flex-shrink:0;background:${isActive?'var(--accent-bg)':'var(--surface-alt)'};color:${isActive?'var(--accent-text)':'var(--text-muted)'};">${initials(p.name)}</div>`;
+    return `<label class="player-chip ${sel?'selected':''}" onclick="togglePlayerChip('${p.id}')">
+      <input type="checkbox" ${sel?'checked':''} style="display:none">
+      <div class="player-chip-check">${sel?'✓':''}</div>
       ${avatarHtml}
-      <div>
-        <div style="font-size:14px;font-weight:500;">${esc(p.name)} <span style="font-size:11px;padding:1px 6px;border-radius:10px;font-weight:400;${isActive?'background:#eaf3de;color:#3b6d11;':'background:#eee;color:#888;'}">${isActive?'Aktiv':'Inaktiv'}</span></div>
-        <div style="font-size:12px;color:var(--text-muted);">Größe ${p.size}${p.preferredNumber ? ' · Wunsch: #'+p.preferredNumber : ''}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${esc(p.name)}<span style="font-size:11px;padding:1px 7px;border-radius:10px;${isActive?'background:#eaf3de;color:#3b6d11;':'background:var(--surface-alt);color:var(--text-muted);'}">${isActive?'Aktiv':'Inaktiv'}</span></div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:1px;">Gr. ${p.size}${p.preferredNumber ? ' · Wunsch #'+p.preferredNumber : ''}</div>
       </div>
     </label>`;
   }).join('');
   updateSelectedCount();
 }
-function togglePlayer(id, cb) {
-  if (cb.checked) selectedPlayers.add(id); else selectedPlayers.delete(id);
-  const label = cb.closest('.player-checkbox');
-  label.classList.toggle('selected', cb.checked);
+function togglePlayerChip(id) {
+  if (selectedPlayers.has(id)) selectedPlayers.delete(id); else selectedPlayers.add(id);
+  renderPlayerSelect();
   updateSelectedCount();
   document.getElementById('match-result-card').style.display = 'none';
   if (selectedPlayers.size > 0) runMatch();
+}
+function togglePlayer(id, cb) {
+  togglePlayerChip(id);
 }
 function updateSelectedCount() {
   document.getElementById('selected-count').textContent = selectedPlayers.size + ' Spieler';
@@ -1904,7 +1962,7 @@ function renderManualResult() {
 
   let html = sortedResults.map(r => {
     const q = r.quality;
-    const jClass = (q==='perfect'||q==='reserved') ? '' : 'warning-jersey';
+    const jClass = (q==='perfect'||q==='reserved') ? 'perfect-jersey' : 'warning-jersey';
     const rowClass = q==='perfect' ? 'q-perfect' : q==='reserved' ? 'q-perfect' : q==='manual' ? 'q-manual' : 'q-partial';
     const qLabel = q==='reserved' ? '🔒 Reserviert' : q==='perfect' ? '✓ Perfekt' : q==='num-only' ? '≈ Wunschnummer' : q==='size-only' ? '≈ Passende Größe' : '';
     const qColor = q==='perfect'||q==='reserved' ? 'var(--success)' : 'var(--warning)';
@@ -1945,9 +2003,9 @@ function renderManualResult() {
   const assigned = manualResults.length;
   const freeCount = manualSetJerseys.filter(j => !takenMap[j.id]).length;
   document.getElementById('match-stats').innerHTML = `
-    <div class="stat-card green"><div class="stat-num">${assigned}</div><div class="stat-label">Zugeordnet</div></div>
-    <div class="stat-card amber"><div class="stat-num">${freeCount}</div><div class="stat-label">Freie Trikots</div></div>
-    <div class="stat-card red"><div class="stat-num">${manualUnmatched.length}</div><div class="stat-label">Ohne Trikot</div></div>
+    <div class="stat-card green"><div class="stat-icon">✓</div><div class="stat-num">${assigned}</div><div class="stat-label">Zugeordnet</div></div>
+    <div class="stat-card amber"><div class="stat-icon">👕</div><div class="stat-num">${freeCount}</div><div class="stat-label">Freie Trikots</div></div>
+    <div class="stat-card red"><div class="stat-icon">⚠️</div><div class="stat-num">${manualUnmatched.length}</div><div class="stat-label">Ohne Trikot</div></div>
   `;
 
   lastMatchResults = { results: manualResults, unmatched: manualUnmatched };
@@ -1998,7 +2056,7 @@ function toggleVorlageCollapse(id) {
 function renderVorlagen() {
   const el = document.getElementById('vorlagen-list');
   if (!db.lineups.length) {
-    el.innerHTML = '<div class="empty-state">Noch keine Vorlagen. Lege z.B. „1. Mannschaft" an.</div>';
+    el.innerHTML = '<div class="card"><div class="empty-state-box"><div class="empty-state-icon">📋</div><div class="empty-state-title">Noch keine Vorlagen</div><div class="empty-state-sub">Lege eine Standardaufstellung an, z.B. „1. Mannschaft".</div></div></div>';
     return;
   }
   el.innerHTML = db.lineups.map(l => {
